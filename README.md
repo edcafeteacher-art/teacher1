@@ -32,4 +32,4 @@ python3 с `lxml`, а для проверки страниц ещё LibreOffice 
 2. В `olympiad/config.js` вставьте Project URL и anon public key (Project Settings → API).
 3. В настройках репозитория (Settings → Pages → Source) выберите GitHub Actions. После слияния в `main` сайт опубликуется сам.
 
-Студенты открывают адрес сайта. Преподаватель открывает тот же адрес с `#teacher` в конце и вводит PIN. Ключи хранятся только в Supabase, а баллы считает сервер. Если вы правите ключ в таблице `settings`, вызовите `rescore_all(pin)`.
+Студенты открывают адрес сайта. Преподаватель открывает тот же адрес с `#teacher` в конце и вводит PIN. Ключи хранятся только в Supabase, а баллы считает сервер. Если вы правите ключ в таблице `olymp_settings`, вызовите `olymp_rescore_all(pin)`.

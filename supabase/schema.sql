@@ -1,5 +1,7 @@
 -- Олимпиада Business English: хранилище ответов в Supabase.
 -- Выполните весь файл в Supabase → SQL Editor → New query → Run.
+-- Все объекты начинаются с olymp_, поэтому файл можно запускать в уже существующем проекте:
+-- он не трогает другие таблицы.
 -- ПЕРЕД ЗАПУСКОМ замените 'CHANGE-ME-PIN' на свой PIN преподавателя.
 --
 -- Схема доступа: прямого доступа к таблицам у анонимного ключа нет (RLS без политик).
@@ -8,14 +10,14 @@
 
 create extension if not exists pgcrypto;
 
-create table if not exists public.settings (
+create table if not exists public.olymp_settings (
   id int primary key default 1 check (id = 1),
   teacher_pin text not null,
   answer_key jsonb not null,
   points jsonb not null
 );
 
-create table if not exists public.results (
+create table if not exists public.olymp_results (
   id uuid primary key default gen_random_uuid(),
   surname text not null,
   name text not null,
@@ -30,16 +32,16 @@ create table if not exists public.results (
   started_at timestamptz,
   submitted_at timestamptz default now()
 );
-create unique index if not exists results_person_uq
-  on public.results (lower(trim(surname)), lower(trim(name)), lower(trim(grp)));
+create unique index if not exists olymp_results_person_uq
+  on public.olymp_results (lower(trim(surname)), lower(trim(name)), lower(trim(grp)));
 
-alter table public.settings enable row level security;
-alter table public.results  enable row level security;
-revoke all on public.settings, public.results from anon, authenticated;
+alter table public.olymp_settings enable row level security;
+alter table public.olymp_results  enable row level security;
+revoke all on public.olymp_settings, public.olymp_results from anon, authenticated;
 
 -- Ключ. Строка означает один правильный ответ, массив означает несколько допустимых.
 -- Сравнение без учёта регистра, лишних пробелов и типа апострофа.
-insert into public.settings (id, teacher_pin, answer_key, points) values (1, 'CHANGE-ME-PIN',
+insert into public.olymp_settings (id, teacher_pin, answer_key, points) values (1, 'CHANGE-ME-PIN',
  $key${
    "T": ["received","was","is preparing",["will be finished","is going to be finished","will have been finished","should be finished"],["have grown","have been growing"],"signed","are produced","visited","were loading","have",["will send","am going to send"],"hearing"],
    "R": ["a","an","the","-","the","an","the","-","the","an"],
@@ -52,25 +54,25 @@ insert into public.settings (id, teacher_pin, answer_key, points) values (1, 'CH
  '{"T":1,"R":1,"C":1,"M":1,"W":1,"P":1,"A":2}'::jsonb)
 on conflict (id) do update set answer_key = excluded.answer_key, points = excluded.points;
 
-create or replace function public.norm(t text) returns text
+create or replace function public.olymp_norm(t text) returns text
 language sql immutable as $$
   select regexp_replace(replace(replace(lower(trim(coalesce(t,''))), '’', ''''), '‘', ''''), '\s+', ' ', 'g')
 $$;
 
 -- Подсчёт баллов по ключу
-create or replace function public.score_answers(a jsonb) returns jsonb
+create or replace function public.olymp_score(a jsonb) returns jsonb
 language plpgsql stable security definer set search_path = public as $$
 declare k jsonb; pts jsonb; sec text; i int; c int; p int; e jsonb; ans text; s jsonb := '{}'; tot int := 0;
 begin
-  select answer_key, points into k, pts from settings where id = 1;
+  select answer_key, points into k, pts from olymp_settings where id = 1;
   for sec in select jsonb_object_keys(k) loop
     c := 0;
     for i in 0 .. jsonb_array_length(k -> sec) - 1 loop
       e := k -> sec -> i;
-      ans := norm(a -> sec ->> i);
+      ans := olymp_norm(a -> sec ->> i);
       if ans <> '' and (
-           (jsonb_typeof(e) = 'array' and exists (select 1 from jsonb_array_elements_text(e) x where norm(x) = ans))
-        or (jsonb_typeof(e) = 'string' and norm(e #>> '{}') = ans)) then
+           (jsonb_typeof(e) = 'array' and exists (select 1 from jsonb_array_elements_text(e) x where olymp_norm(x) = ans))
+        or (jsonb_typeof(e) = 'string' and olymp_norm(e #>> '{}') = ans)) then
         c := c + 1;
       end if;
     end loop;
@@ -82,7 +84,7 @@ begin
 end $$;
 
 -- Отправка работы студентом (один раз на фамилию+имя+группу)
-create or replace function public.submit_result(p jsonb) returns jsonb
+create or replace function public.olymp_submit(p jsonb) returns jsonb
 language plpgsql volatile security definer set search_path = public as $$
 declare sc jsonb;
 begin
@@ -90,8 +92,8 @@ begin
     raise exception 'surname, name and group are required';
   end if;
   if length(p::text) > 20000 then raise exception 'payload too large'; end if;
-  sc := score_answers(p->'answers');
-  insert into results (surname, name, grp, code, answers, scores, auto_score, leaves, auto_submitted, started_at)
+  sc := olymp_score(p->'answers');
+  insert into olymp_results (surname, name, grp, code, answers, scores, auto_score, leaves, auto_submitted, started_at)
   values (left(trim(p->>'surname'),80), left(trim(p->>'name'),80), left(trim(p->>'grp'),40), left(trim(coalesce(p->>'code','')),40),
           p->'answers', sc, (sc->>'auto')::int, coalesce((p->>'leaves')::int,0), coalesce((p->>'auto_submitted')::boolean,false),
           nullif(p->>'started_at','')::timestamptz);
@@ -101,33 +103,33 @@ exception when unique_violation then
 end $$;
 
 -- Чтение результатов преподавателем
-create or replace function public.get_results(pin text) returns setof public.results
+create or replace function public.olymp_get_results(pin text) returns setof public.olymp_results
 language plpgsql stable security definer set search_path = public as $$
 begin
-  if not exists (select 1 from settings where id = 1 and teacher_pin = pin) then raise exception 'wrong PIN'; end if;
-  return query select * from results order by submitted_at;
+  if not exists (select 1 from olymp_settings where id = 1 and teacher_pin = pin) then raise exception 'wrong PIN'; end if;
+  return query select * from olymp_results order by submitted_at;
 end $$;
 
 -- Балл за открытый ответ (0–4)
-create or replace function public.set_open_score(pin text, rid uuid, s int) returns void
+create or replace function public.olymp_set_open_score(pin text, rid uuid, s int) returns void
 language plpgsql volatile security definer set search_path = public as $$
 begin
-  if not exists (select 1 from settings where id = 1 and teacher_pin = pin) then raise exception 'wrong PIN'; end if;
-  update results set open_score = case when s is null then null else greatest(0, least(4, s)) end where id = rid;
+  if not exists (select 1 from olymp_settings where id = 1 and teacher_pin = pin) then raise exception 'wrong PIN'; end if;
+  update olymp_results set open_score = case when s is null then null else greatest(0, least(4, s)) end where id = rid;
 end $$;
 
 -- Пересчёт всех работ после правки ключа
-create or replace function public.rescore_all(pin text) returns int
+create or replace function public.olymp_rescore_all(pin text) returns int
 language plpgsql volatile security definer set search_path = public as $$
 declare n int;
 begin
-  if not exists (select 1 from settings where id = 1 and teacher_pin = pin) then raise exception 'wrong PIN'; end if;
-  update results set scores = score_answers(answers), auto_score = (score_answers(answers)->>'auto')::int;
+  if not exists (select 1 from olymp_settings where id = 1 and teacher_pin = pin) then raise exception 'wrong PIN'; end if;
+  update olymp_results set scores = olymp_score(answers), auto_score = (olymp_score(answers)->>'auto')::int;
   get diagnostics n = row_count; return n;
 end $$;
 
-revoke all on function public.score_answers(jsonb) from public, anon, authenticated;
-grant execute on function public.submit_result(jsonb) to anon;
-grant execute on function public.get_results(text) to anon;
-grant execute on function public.set_open_score(text, uuid, int) to anon;
-grant execute on function public.rescore_all(text) to anon;
+revoke all on function public.olymp_score(jsonb) from public, anon, authenticated;
+grant execute on function public.olymp_submit(jsonb) to anon;
+grant execute on function public.olymp_get_results(text) to anon;
+grant execute on function public.olymp_set_open_score(text, uuid, int) to anon;
+grant execute on function public.olymp_rescore_all(text) to anon;

@@ -102,7 +102,7 @@ input.gap{width:9.5em;display:inline-block;padding:3px 6px;margin:0 2px}
 <script src="config.js"></script>
 <script>
 /* ============================ CONTENT ============================
-   Ключи ответов хранятся только в Supabase (таблица settings), здесь их нет.
+   Ключи ответов хранятся только в Supabase (таблица olymp_settings), здесь их нет.
    В текстах [[n|подсказка]] обозначает пропуск n (нумерация с 1). */
 const CFG = window.OLYMPIAD_CONFIG || {};
 const ART = ["a","an","the","-"];
@@ -277,7 +277,7 @@ async function submit(auto){
   if (rec.status==="submitted"||rec._sending) return; rec._sending=true;
   clearInterval(tick); const msg=$("#msg"); msg&&(msg.textContent="Отправляем…");
   try{
-    const r=await rpc("submit_result",{p:{surname:rec.surname,name:rec.name,grp:rec.group,code:rec.code,answers:rec.answers,started_at:new Date(rec.startedAt).toISOString(),leaves:rec.leaves,auto_submitted:!!auto}});
+    const r=await rpc("olymp_submit",{p:{surname:rec.surname,name:rec.name,grp:rec.group,code:rec.code,answers:rec.answers,started_at:new Date(rec.startedAt).toISOString(),leaves:rec.leaves,auto_submitted:!!auto}});
     if (r && r.ok===false && r.reason==="duplicate"){ msg&&(msg.textContent="Работа с такими фамилией, именем и группой уже отправлена. Обратитесь к преподавателю."); rec._sending=false; return; }
     rec.status="submitted"; rec.submittedAt=Date.now(); delete rec._sending; save(); renderDone();
   }catch(e){ rec._sending=false; msg&&(msg.textContent="Не удалось отправить ("+e.message+"). Проверьте интернет и нажмите ещё раз."); if(auto) setTimeout(()=>submit(true),5000); }
@@ -298,11 +298,11 @@ function renderTeacherLogin(){
     el("label",{class:"f"},"PIN преподавателя", el("input",{type:"password",id:"pin",required:true,autocomplete:"current-password"})),
     el("div",{class:"row"}, el("button",{type:"submit",text:"Открыть результаты"}), el("span",{class:"muted",id:"pmsg"})));
   f.addEventListener("submit",async e=>{ e.preventDefault(); PIN=$("#pin").value; $("#pmsg").textContent="Проверяем…";
-    try{ rows=await rpc("get_results",{pin:PIN}); renderTeacher(); }catch(err){ $("#pmsg").textContent="Не удалось войти: "+err.message; } });
+    try{ rows=await rpc("olymp_get_results",{pin:PIN}); renderTeacher(); }catch(err){ $("#pmsg").textContent="Не удалось войти: "+err.message; } });
   if(!configured()) f.append(el("div",{class:"note err",text:"Заполните SUPABASE_URL и SUPABASE_ANON_KEY в config.js."}));
   main.append(f);
 }
-async function refresh(){ try{ rows=await rpc("get_results",{pin:PIN}); draw(); $("#upd").textContent="обновлено "+new Date().toLocaleTimeString("ru-RU"); }catch(e){ $("#upd").textContent="ошибка обновления: "+e.message; } }
+async function refresh(){ try{ rows=await rpc("olymp_get_results",{pin:PIN}); draw(); $("#upd").textContent="обновлено "+new Date().toLocaleTimeString("ru-RU"); }catch(e){ $("#upd").textContent="ошибка обновления: "+e.message; } }
 
 function renderTeacher(){
   $("#app").classList.add("wide"); main.replaceChildren(
@@ -332,7 +332,7 @@ function draw(){
     const sc=r.scores||{};
     const os=el("input",{type:"number",min:0,max:OPEN_MAX,class:"oscore","aria-label":"Балл за открытый ответ",value:r.open_score??""});
     os.addEventListener("change",async()=>{ const v=os.value===""?null:Math.max(0,Math.min(OPEN_MAX,Math.round(Number(os.value))));
-      try{ await rpc("set_open_score",{pin:PIN,rid:r.id,s:v}); r.open_score=v; draw(); }catch(e){ $("#tmsg").textContent="Не удалось сохранить: "+e.message; } });
+      try{ await rpc("olymp_set_open_score",{pin:PIN,rid:r.id,s:v}); r.open_score=v; draw(); }catch(e){ $("#tmsg").textContent="Не удалось сохранить: "+e.message; } });
     const flags=[]; if(r.code) flags.push(`код: ${r.code}`); if(r.leaves) flags.push(`уходил(а) со вкладки: ${r.leaves}`); if(r.auto_submitted) flags.push("отправлено по таймеру");
     if(r.started_at&&r.submitted_at) flags.push(`время работы: ${Math.round((new Date(r.submitted_at)-new Date(r.started_at))/60000)} мин`);
     const a=r.answers||{};
