@@ -108,20 +108,20 @@ const CFG = window.OLYMPIAD_CONFIG || {};
 const ART = ["a","an","the","-"];
 const SECTIONS = [
  { id:"T", title:"1. Tenses", each:1, n:12, kind:"type",
-   intro:"Put the verbs in brackets into the correct form. Раскройте скобки, поставив глагол в нужную форму (время, залог, -ing).",
+   intro:"Put the verbs in brackets into the correct form.",
    text:"Dear Anna,\n\nThank you for your email. I [[1|receive]] it yesterday, but I [[2|be]] at a trade fair all day, so I couldn't reply. At the moment our team [[3|prepare]] the annual report, and it [[4|finish]] by Friday. Since January our sales [[5|grow]] by 12 per cent.\n\nLast month we [[6|sign]] a contract with a new supplier from Poland. Their goods are cheaper because they [[7|produce]] in a small town where costs are low. When I [[8|visit]] their factory, the workers [[9|load]] a lorry with our order.\n\nIf you [[10|have]] any questions, please call me. I [[11|send]] you the new figures as soon as I get them. I look forward to [[12|hear]] from you.\n\nBest regards,\nPeter" },
  { id:"R", title:"2. Articles", each:1, n:10, kind:"select", opts:ART,
-   intro:"Fill the gaps with a / an / the or – (no article). Выберите артикль; «-» означает, что артикль не нужен.",
+   intro:"Fill the gaps with a / an / the or – (no article).",
    text:"[[1]] small company from Kazan has opened [[2]] online shop. [[3]] shop sells [[4]] tea and coffee at low prices. [[5]] owner, Marat Ilyin, is [[6]] economist by education. He says that [[7]] internet helped him find customers all over [[8]] Russia. Last year [[9]] number of orders doubled, and now he wants to open [[10]] office in Moscow." },
- { id:"C", title:"3. Open cloze", each:1, n:10, kind:"type",
-   intro:"Read the text and fill each gap with ONE word. Впишите в каждый пропуск одно слово.",
+ { id:"C", title:"3. Lexis", each:1, n:10, kind:"type",
+   intro:"Read the text and fill each gap with ONE word.",
    text:"Today more and more people pay [[1]] their purchases with a smartphone. This is convenient because you do not need to carry cash [[2]] you. Many small shops have also started [[3]] accept card payments. However, not everyone is happy [[4]] this change. Older people, [[5]] example, often prefer to use cash. Some experts say that cash is safer [[6]] digital money because it cannot be hacked. [[7]] the other hand, digital payments are faster and cheaper for businesses, [[8]] is why banks support them. In the future, cash may disappear completely, [[9]] it is difficult to say when. Whatever happens, we will all have [[10]] learn new ways of managing our money." },
  { id:"M", title:"4. Word choice", each:1, n:10, kind:"select",
-   intro:"Complete the passage by choosing the word which best fits each gap. Выберите слово, которое лучше всего подходит по смыслу и сочетаемости.",
+   intro:"Complete the passage by choosing the word which best fits each gap.",
    opts:[["dreamed","thought","wondered","hoped"],["set","took","made","put"],["make","do","get","keep"],["high","tall","long","deep"],["take","make","borrow","lend"],["spent","paid","invested","bought"],["willing","wanting","agreeing","liking"],["employed","occupied","worked","used"],["pays","costs","earns","gives"],["on","over","at","in"]],
    text:"Anna had always [[1]] of running her own business. After college she [[2]] up a small bakery in her home town. At first it was hard to [[3]] ends meet because the rent was very [[4]]. She decided to [[5]] out a bank loan and [[6]] the money in a new oven. Soon her bread became popular, and customers were [[7]] to pay more for quality. Two years later she opened a second shop and [[8]] five new people. Her story shows that hard work really [[9]] off. Today Anna is [[10]] the moon about her results." },
  { id:"W", title:"5. Word formation", each:1, n:10, kind:"type",
-   intro:"Use the word in brackets to form a word that fits the gap. Образуйте от слова в скобках однокоренное слово, подходящее по смыслу.",
+   intro:"Use the word in brackets to form a word that fits the gap.",
    text:"Igor Petrov is one of the most [[1|SUCCESS]] young businessmen in our city. Five years ago the [[2|MANAGE]] of a large factory refused his plan, saying it was completely [[3|REAL]]. Igor made a quick [[4|DECIDE]] and started his own firm. Its sales rose [[5|DRAMATIC]] in the first year. The [[6|GROW]] of online trade helped him a lot. Igor knows that many young people face [[7|EMPLOY]] after college, so he hires graduates. He also works with a financial [[8|ADVISE]], because customers expect [[9|RELY]] service and stable prices. Now he spends money on the [[10|DEVELOP]] of new products." },
  { id:"P", title:"6. Reading: careers", each:1, n:10, kind:"match",
    intro:"Read about five people and their careers in economics. For questions 1–10, choose from the people A–E. The people may be chosen more than once.",
@@ -133,7 +133,7 @@ const SECTIONS = [
     ["E","Maria, junior auditor","Many of my friends went to university, but I believe practical experience is more valuable than lectures. That's why I joined an audit firm as an intern straight after college. I asked my boss to let me check a real client's documents, and he was so impressed with my work that he offered me a permanent contract."]],
    qs:["Which person changed their career plans because they wanted a steady income?","Which person admits they were not good at one part of their job at first?","Which person benefited from showing what they could do?","Which person made a suggestion that improved colleagues' working conditions?","Which person thinks work experience is better than higher education?","Which person went abroad to work?","Which person followed a parent's advice?","Which person is self-taught in their field?","Which person used their good reputation to grow their business?","Which person has a limited social life at a certain time of year?"] },
  { id:"A", title:"7. Listening", each:2, kind:"mcq",
-   intro:"Посмотрите видео (можно дважды) и ответьте на вопросы. Ответы не звучат в видео дословно, их нужно вывести из услышанного.",
+   intro:"Watch the video (you may watch it twice) and answer the questions. The answers are not said word for word in the video, so think about what you hear.",
    qs:[
     {t:"Why does the narrator mention that there are no rivers near Stonehenge?", o:["To explain why it was easy to bring the stones.","To show that the choice of the place is a puzzle.","To prove that the builders came from Wales."]},
     {t:"Ian says that about 6,000 people come on an average summer day and over a million people visit in a year. What can we conclude?", o:["The site gets the same number of visitors every day.","There are far fewer visitors per day outside the summer.","Most visitors come in winter."]},
@@ -185,7 +185,7 @@ function renderLogin(){
   const f = el("form",{class:"card"});
   f.append(
     el("div",{}, el("div",{class:"eyebrow",text:"Вход участника"}), el("h2",{text:"Представьтесь перед началом"})),
-    el("p",{class:"muted",text:`${SECTIONS.length} заданий: времена, артикли, открытый cloze, выбор слова, словообразование, чтение и аудирование по видео. Максимум ${TOTAL} баллов. Время ${CFG.TIME_LIMIT_MIN||70} минут, таймер запускается после нажатия «Начать». Работу можно отправить только один раз.`}),
+    el("p",{class:"muted",text:`${SECTIONS.length} заданий: времена, артикли, лексика, выбор слова, словообразование, чтение и аудирование по видео. Максимум ${TOTAL} баллов. Время ${CFG.TIME_LIMIT_MIN||70} минут, таймер запускается после нажатия «Начать». Работу можно отправить только один раз.`}),
     el("div",{class:"grid2"},
       el("label",{class:"f"},"Фамилия*", el("input",{type:"text",id:"surname",required:true,autocomplete:"family-name"})),
       el("label",{class:"f"},"Имя*", el("input",{type:"text",id:"fname",required:true,autocomplete:"given-name"})),
@@ -239,7 +239,7 @@ function renderSection(){
   const pane=$("#pane"); pane.replaceChildren();
   if (current==="S") return renderSubmit(pane);
   const sec=SECTIONS.find(s=>s.id===current);
-  const card=el("section",{class:"card"}, el("div",{}, el("div",{class:"eyebrow",text:maxOf(sec)+" баллов"}), el("h2",{text:sec.title})), el("p",{text:sec.intro}));
+  const card=el("section",{class:"card"}, el("div",{}, el("div",{class:"eyebrow",text:maxOf(sec)+" points"}), el("h2",{text:sec.title})), el("p",{text:sec.intro}));
   if (sec.text) card.append(gapText(sec));
   if (sec.kind==="match"){
     sec.people.forEach(([L,name,txt])=>card.append(el("div",{class:"person"}, el("h3",{text:`${L}. ${name}`}), el("p",{text:txt}))));
@@ -248,14 +248,14 @@ function renderSection(){
   if (sec.kind==="mcq"){
     const id=ytId(CFG.VIDEO_URL);
     if (id) card.append(el("div",{class:"video"}, el("iframe",{src:`https://www.youtube-nocookie.com/embed/${id}?rel=0`,title:"Listening video",allow:"encrypted-media; picture-in-picture",allowfullscreen:true})),
-      el("p",{class:"muted"},"Если видео не открывается, используйте ссылку: ", el("a",{href:CFG.VIDEO_URL,target:"_blank",rel:"noopener",text:CFG.VIDEO_URL})));
+      el("p",{class:"muted"},"If the video does not play, use this link: ", el("a",{href:CFG.VIDEO_URL,target:"_blank",rel:"noopener",text:CFG.VIDEO_URL})));
     else card.append(el("div",{class:"note err",text:"Видео ещё не добавлено. Сообщите преподавателю."}));
     sec.qs.forEach((q,i)=>{ const box=el("div",{class:"opts",role:"radiogroup"});
       q.o.forEach((o,k)=>{ const id=`${sec.id}${i}_${k}`; box.append(el("label",{for:id}, el("input",{type:"radio",name:`${sec.id}${i}`,id,value:o,checked:cur(sec.id,i)===o,onchange:()=>setAns(sec.id,i,o)}), el("span",{text:`${"abc"[k]}) ${o}`}))); });
       card.append(el("div",{class:"q"}, el("div",{class:"n",text:`${i+1}`}), el("div",{text:q.t}), box)); });
     if (sec.open?.t){ const ta=el("textarea",{id:"open",placeholder:"Your answer in English…"}); ta.value=rec.answers.open||""; const wc=el("span",{class:"muted"});
       const upd=()=>wc.textContent=`Слов: ${words(ta.value)}`; ta.addEventListener("input",()=>{ rec.answers.open=ta.value; save(); upd(); }); upd();
-      card.append(el("div",{class:"q"}, el("div",{class:"n",text:`Open question · ${sec.open.max} б. (объём 40–60 слов, две выгоды и один риск)`}), el("div",{text:sec.open.t}), ta, wc)); }
+      card.append(el("div",{class:"q"}, el("div",{class:"n",text:`Open question · ${sec.open.max} points`}), el("div",{text:sec.open.t}), ta, wc)); }
   }
   const idx=SECTIONS.indexOf(sec);
   card.append(el("div",{class:"row"}, el("button",{type:"button",onclick:()=>go(SECTIONS[idx+1]?.id||"S"),text:SECTIONS[idx+1]?"Следующее задание →":"К отправке →"})));
