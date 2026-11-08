@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Олимпиада Business English</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: narrow exam column for students, wide ledger for the teacher; ink-teal + ochre, like a printed exam booklet. */
+:root{
+  --bg:#f4f6f5; --paper:#ffffff; --ink:#14232a; --muted:#5b6b70; --line:#d5dddc;
+  --accent:#0f5e63; --accent-ink:#ffffff; --ochre:#9a6416; --ok:#2f7d4a; --bad:#b03a2e; --soft:#e6efee;
+  --f-display:"Unbounded","Golos Text",system-ui,sans-serif;
+  --f-body:"Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0f1719; --paper:#162225; --ink:#e3ecea; --muted:#94a7a8; --line:#2a3b3e;
+  --accent:#4fb3b0; --accent-ink:#06201f; --ochre:#e0a64a; --ok:#5cc27e; --bad:#ef7a6d; --soft:#1d3033; color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 60px}
+.wrap{max-width:820px;margin:0 auto;display:grid;gap:18px}
+.wide{max-width:1200px}
+header.top{display:flex;flex-wrap:wrap;gap:12px;align-items:baseline;justify-content:space-between;border-bottom:2px solid var(--ink);padding-bottom:10px}
+h1{font:700 clamp(20px,3.4vw,28px)/1.15 var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h2{font:600 19px/1.25 var(--f-display);margin:0 0 6px;text-wrap:balance}
+h3{font:600 15px/1.3 var(--f-body);margin:6px 0 0}
+.eyebrow{font:600 11px/1 var(--f-body);letter-spacing:.12em;text-transform:uppercase;color:var(--ochre)}
+.muted{color:var(--muted)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:20px;display:grid;gap:14px;min-width:0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+label.f{display:grid;gap:4px;font-weight:500;font-size:14px}
+input[type=text],input[type=number],input[type=password],select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:9px 10px;width:100%}
+select.inl{width:auto;display:inline-block;padding:4px 8px;margin:0 4px}
+textarea{min-height:150px;resize:vertical}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--ochre);outline-offset:2px}
+button{font:600 14px var(--f-body);border-radius:4px;padding:10px 16px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);cursor:pointer}
+button.ghost{background:transparent;color:var(--accent)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs button{background:transparent;color:var(--ink);border-color:var(--line);font-weight:500}
+.tabs button[aria-current="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tabs .pts{font:12px var(--f-mono);opacity:.7;margin-left:6px}
+.q{display:grid;gap:8px;padding:12px 0;border-top:1px dashed var(--line)}
+.q .n{font:600 13px var(--f-mono);color:var(--ochre)}
+.opts{display:grid;gap:6px}
+.opts label{display:flex;gap:8px;align-items:flex-start;cursor:pointer}
+.text{background:var(--soft);border-radius:4px;padding:14px 16px;max-width:68ch}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:8px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+.timer{font:600 18px var(--f-mono);font-variant-numeric:tabular-nums}
+.timer.low{color:var(--bad)}
+.note{border-left:3px solid var(--ochre);padding:8px 12px;background:var(--soft);border-radius:0 4px 4px 0;font-size:14px}
+.err{border-left-color:var(--bad)}
+.video{position:relative;width:100%;max-width:100%;aspect-ratio:16/9;background:#000;border-radius:4px;overflow:hidden}
+.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font:600 11px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+td.num,th.num{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto}
+.pill{display:inline-block;font:600 11px var(--f-body);letter-spacing:.05em;padding:3px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.pill.ok{color:var(--ok)} .pill.bad{color:var(--bad)} .pill.wait{color:var(--ochre)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stat{border:1px solid var(--line);border-radius:6px;padding:12px 14px;background:var(--paper)}
+.stat b{display:block;font:700 26px var(--f-display);font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted)}
+details summary{cursor:pointer;color:var(--accent);font-weight:500}
+.answers{font-size:13px;display:grid;gap:4px;margin-top:8px}
+.essay{white-space:pre-wrap;background:var(--soft);padding:10px;border-radius:4px;max-width:68ch;font-size:14px}
+.oscore{width:72px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="app" class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">Олимпиада · экономические специальности · 1 курс</div>
+      <h1>Business English Olympiad</h1>
+    </div>
+    <span class="muted" id="who"></span>
+  </header>
+  <main id="main"></main>
+</div>
+<script src="config.js"></script>
+<script>
+/* ============================ CONTENT ============================
+   Ключи ответов хранятся только в Supabase (таблица settings), здесь их нет. */
+const CFG = window.OLYMPIAD_CONFIG || {};
+const SECTIONS = [
+ { id:"G", title:"1. Grammar", each:1,
+   intro:"Выберите один правильный вариант. Проверяются времена, пассивный залог и модальные глаголы.",
+   qs:[
+    {t:"The annual report ___ by the accountant last Friday.", o:["prepared","was prepared","has prepared"]},
+    {t:"Our goods ___ to twenty countries every year.", o:["export","exporting","are exported"]},
+    {t:"The contract ___ yet, so we can't start the project.", o:["hasn't been signed","didn't sign","isn't signing"]},
+    {t:"Employees ___ wear an ID badge at all times. It's a company rule.", o:["might","must","needn't"]},
+    {t:"You ___ pay in cash. We also accept cards.", o:["mustn't","can't","don't have to"]},
+    {t:"It's 8 p.m. The bank ___ have closed already.", o:["must","can't","needn't"]},
+    {t:"He ___ the email. He was in hospital all week.", o:["must have sent","can't have sent","should have sent"]},
+    {t:"Now the delivery is late. We ___ the order earlier.", o:["should have placed","must place","can place"]},
+    {t:"By the end of this year, the company ___ 50 new employees.", o:["has hired","hires","will have hired"]},
+    {t:"When the customer called, the goods ___.", o:["packed","were being packed","have been packed"]},
+    {t:"If the price ___ lower, we would buy more.", o:["were","is","will be"]},
+    {t:"The new tax rules are expected ___ next year.", o:["to introduce","introducing","to be introduced"]}
+   ]},
+ { id:"X", title:"2. Language & Logic", each:1,
+   intro:"Лексико-грамматическое задание на логику. Каждый ответ однозначен и оценивается в 1 балл.",
+   parts:[
+    {h:"A. Choose the word that shows the logical link.", from:0, to:4},
+    {h:"B. Choose the correct form of the word.", from:5, to:9},
+    {h:"C. Put the stages of hiring in the logical order. Choose a letter for each step (each letter is used once).", from:10, to:14, order:true}
+   ],
+   qs:[
+    {t:"Sales fell in March. ___, the company cut its prices.", o:["However","As a result","Although"], inl:true},
+    {t:"___ the high costs, the project was a success.", o:["Because","Although","Despite"], inl:true},
+    {t:"Profits rose, ___ costs increased too.", o:["so","but","because"], inl:true},
+    {t:"We hired more staff ___ demand was growing.", o:["although","despite","because"], inl:true},
+    {t:"The product is cheap and reliable. ___, customers buy it again and again.", o:["Therefore","However","Although"], inl:true},
+    {t:"The country's ___ is growing fast.", o:["economic","economy","economical"], inl:true},
+    {t:"We need an ___ car that uses little fuel.", o:["economical","economist","economy"], inl:true},
+    {t:"She works as an ___ at the central bank.", o:["economy","economic","economist"], inl:true},
+    {t:"The company made a large ___ in new equipment.", o:["invest","investor","investment"], inl:true},
+    {t:"Our main ___ is a firm from Germany.", o:["competitor","compete","competitive"], inl:true},
+    {t:"Step 1"},{t:"Step 2"},{t:"Step 3"},{t:"Step 4"},{t:"Step 5"}
+   ],
+   steps:{A:"The best candidate receives a job offer.",B:"The company publishes a job advertisement.",C:"The new employee signs a contract.",D:"Candidates send their CVs.",E:"Shortlisted candidates are invited to an interview."}
+ },
+ { id:"A", title:"3. Listening", each:2,
+   intro:"Посмотрите видео (можно дважды) и ответьте на вопросы. Ответы не звучат в видео дословно: их нужно вывести из услышанного.",
+   qs:[
+    {t:"Why does the narrator mention that there are no rivers near Stonehenge?", o:["To explain why it was easy to bring the stones.","To show that the choice of the place is a puzzle.","To prove that the builders came from Wales."]},
+    {t:"Ian says that about 6,000 people come on an average summer day and over a million people visit in a year. What can we conclude?", o:["The site gets the same number of visitors every day.","There are far fewer visitors per day outside the summer.","Most visitors come in winter."]},
+    {t:"Compare the ditch and bank with the stone monument. The ditch and bank are…", o:["about 500 years younger.","the same age.","about 500 years older."]},
+    {t:"How do researchers know where the builders lived?", o:["They found remains of huts at Durrington Walls.","They read written records of that time.","They studied the stone tools inside the monument."]},
+    {t:"Compare the journeys of the two types of stone. Which statement is correct?", o:["The bluestones came a shorter distance than the sarsen stones.","Both types of stone came from Wales.","The bluestones travelled about ten times farther than the sarsen stones."]},
+    {t:"About a hundred men were probably needed to pull one sarsen stone. What does this suggest about the people who built Stonehenge?", o:["The work was done by a few specialists.","They could organise a large number of workers.","They used machines to move the stones."]},
+    {t:"Which of these does Ian present as known for sure, not as a theory?", o:["The monument is aligned with the summer and winter solstices.","It was built by people from another planet.","It was a monument to the ancestors."]},
+    {t:"What is the main idea of the end of the video?", o:["New technology shows the site is more complex than people thought.","Scientists now know everything about Stonehenge.","The stones under the ground were added recently."]}
+   ],
+   open:{t:"Stonehenge receives more than a million visitors a year. Imagine you are an economist. Name two ways the monument benefits the local economy and one problem that mass tourism can cause. Write 40–60 words.", max:4}
+ }
+];
+
+/* ============================ HELPERS ============================ */
+const $ = s => document.querySelector(s);
+const el = (tag, attrs={}, ...kids) => { const e=document.createElement(tag);
+  for (const [k,v] of Object.entries(attrs)) { if (k==="class") e.className=v; else if (k==="text") e.textContent=v; else if (k.startsWith("on")) e.addEventListener(k.slice(2),v); else if (v!==false && v!=null) e.setAttribute(k,v===true?"":v); }
+  for (const k of kids) if (k!=null) e.append(k); return e; };
+const words = s => (s||"").trim().split(/\s+/).filter(Boolean).length;
+const fmtTime = ms => { const s=Math.max(0,Math.floor(ms/1000)); return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0"); };
+const store = { get(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } }, set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }, del(k){ try{ localStorage.removeItem(k);}catch(e){} } };
+const configured = () => CFG.SUPABASE_URL && CFG.SUPABASE_ANON_KEY;
+async function rpc(fn, body){
+  const r = await fetch(`${CFG.SUPABASE_URL.replace(/\/$/,"")}/rest/v1/rpc/${fn}`, { method:"POST",
+    headers:{ "apikey":CFG.SUPABASE_ANON_KEY, "Authorization":"Bearer "+CFG.SUPABASE_ANON_KEY, "Content-Type":"application/json" }, body:JSON.stringify(body) });
+  const txt = await r.text(); const data = txt ? JSON.parse(txt) : null;
+  if (!r.ok) throw new Error(data?.message || ("HTTP "+r.status)); return data; }
+function ytId(url){ const m=String(url||"").match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([A-Za-z0-9_-]{11})/); return m?m[1]:null; }
+const LETTERS="ABCDE";
+const maxOf = sec => sec.qs.length*sec.each + (sec.open?.t ? sec.open.max : 0);
+
+/* ============================ ROUTER ============================ */
+const main = $("#main");
+
+/* ============================ STUDENT ============================ */
+let rec=null, current="G", tick=null;
+const DRAFT="olymp_draft_v1";
+
+function bootStudent(){
+  $("#who").textContent="Участник";
+  if (!configured()) main.append(el("div",{class:"note err",text:"Хранилище результатов ещё не подключено (config.js). Сообщите преподавателю."}));
+  rec = store.get(DRAFT);
+  if (rec?.status==="submitted") return renderDone();
+  if (rec) return startExam();
+  renderLogin();
+}
+
+function renderLogin(){
+  const total = SECTIONS.reduce((s,x)=>s+maxOf(x),0);
+  const f = el("form",{class:"card"});
+  f.append(
+    el("div",{}, el("div",{class:"eyebrow",text:"Вход участника"}), el("h2",{text:"Представьтесь перед началом"})),
+    el("p",{class:"muted",text:`Три задания: грамматика, язык и логика, аудирование по видео. Максимум ${total} баллов. Время ${CFG.TIME_LIMIT_MIN||50} минут, таймер запускается после нажатия «Начать». Работу можно отправить только один раз.`}),
+    el("div",{class:"grid2"},
+      el("label",{class:"f"},"Фамилия*", el("input",{type:"text",id:"surname",required:true,autocomplete:"family-name"})),
+      el("label",{class:"f"},"Имя*", el("input",{type:"text",id:"fname",required:true,autocomplete:"given-name"})),
+      el("label",{class:"f"},"Группа*", el("input",{type:"text",id:"group",required:true,placeholder:"например, ЭК-11"})),
+      el("label",{class:"f"},"Код участника", el("input",{type:"text",id:"pcode",placeholder:"если выдан"}))),
+    el("div",{class:"note",text:"Для аудирования понадобятся наушники. Не закрывайте и не перезагружайте вкладку без необходимости: черновик хранится в этом браузере."}),
+    el("div",{class:"row"}, el("button",{type:"submit",text:"Начать олимпиаду"})));
+  f.addEventListener("submit", e=>{ e.preventDefault(); const v=id=>$("#"+id).value.trim();
+    rec={surname:v("surname"),name:v("fname"),group:v("group"),code:v("pcode"),status:"in_progress",startedAt:Date.now(),answers:{G:[],X:[],A:[],open:""},leaves:0};
+    store.set(DRAFT,rec); main.replaceChildren(); startExam(); });
+  main.append(f);
+}
+
+function startExam(){
+  $("#who").textContent=`${rec.surname} ${rec.name} · ${rec.group}`;
+  main.replaceChildren(el("div",{class:"bar"}, el("nav",{class:"tabs",id:"tabs"}), el("span",{class:"timer",id:"timer"})), el("div",{id:"pane",style:"margin-top:14px"}));
+  renderTabs(); renderSection();
+  tick=setInterval(updateTimer,1000); updateTimer();
+  document.addEventListener("visibilitychange",()=>{ if(document.hidden && rec.status!=="submitted"){ rec.leaves++; save(); } });
+}
+const save = () => store.set(DRAFT,rec);
+function updateTimer(){ const left=rec.startedAt+(CFG.TIME_LIMIT_MIN||50)*60000-Date.now(); const t=$("#timer"); if(!t) return;
+  t.textContent="⏱ "+fmtTime(left); t.classList.toggle("low",left<5*60000); if(left<=0){ clearInterval(tick); submit(true); } }
+function go(id){ current=id; renderTabs(); renderSection(); scrollTo({top:0}); }
+function renderTabs(){ const nav=$("#tabs"); nav.replaceChildren();
+  SECTIONS.forEach(s=>nav.append(el("button",{type:"button","aria-current":String(current===s.id),onclick:()=>go(s.id)}, s.title, el("span",{class:"pts",text:maxOf(s)+" б."}))));
+  nav.append(el("button",{type:"button","aria-current":String(current==="S"),onclick:()=>go("S")},"Отправка")); }
+function setAns(sec,i,v){ rec.answers[sec] ||= []; rec.answers[sec][i]=v; save(); }
+
+function choice(sec,i,q){
+  const cur=(rec.answers[sec.id]||[])[i];
+  if (q.inl){ const s=el("select",{class:"inl",id:`${sec.id}${i}`,"aria-label":`${sec.id}${i+1}`,onchange:e=>setAns(sec.id,i,e.target.value)}, el("option",{value:"",text:"— choose —"}));
+    q.o.forEach(o=>s.append(el("option",{value:o,text:o,selected:cur===o}))); const [a,b]=q.t.split("___"); return el("div",{},a,s,b||""); }
+  const box=el("div",{class:"opts",role:"radiogroup"});
+  q.o.forEach((o,k)=>{ const id=`${sec.id}${i}_${k}`; box.append(el("label",{for:id}, el("input",{type:"radio",name:`${sec.id}${i}`,id,value:o,checked:cur===o,onchange:()=>setAns(sec.id,i,o)}), el("span",{text:`${"abc"[k]}) ${o}`}))); });
+  return el("div",{}, el("div",{text:q.t}), box);
+}
+
+function renderSection(){
+  const pane=$("#pane"); pane.replaceChildren();
+  if (current==="S") return renderSubmit(pane);
+  const sec=SECTIONS.find(s=>s.id===current);
+  const card=el("section",{class:"card"}, el("div",{}, el("div",{class:"eyebrow",text:maxOf(sec)+" баллов"}), el("h2",{text:sec.title})), el("p",{text:sec.intro}));
+  if (sec.id==="A"){
+    const id=ytId(CFG.VIDEO_URL);
+    if (id) card.append(el("div",{class:"video"}, el("iframe",{src:`https://www.youtube-nocookie.com/embed/${id}?rel=0`,title:"Listening video",allow:"encrypted-media; picture-in-picture",allowfullscreen:true})),
+      el("p",{class:"muted"},"Если видео не открывается, используйте ссылку: ", el("a",{href:CFG.VIDEO_URL,target:"_blank",rel:"noopener",text:CFG.VIDEO_URL})));
+    else card.append(el("div",{class:"note err",text:"Видео ещё не добавлено. Сообщите преподавателю."}));
+    if (!sec.qs.length) card.append(el("p",{class:"muted",text:"Вопросы к видео появятся здесь."}));
+  }
+  const block=(i,q)=>el("div",{class:"q"}, el("div",{class:"n",text:`${sec.id}${i+1}`}), choice(sec,i,q));
+  if (sec.parts){
+    sec.parts.forEach(p=>{ card.append(el("h3",{text:p.h}));
+      if (p.order){ const t=el("div",{class:"text"}); Object.entries(sec.steps).forEach(([k,v])=>t.append(el("div",{text:`${k}) ${v}`}))); card.append(t);
+        const row=el("div",{class:"row"});
+        for(let i=p.from;i<=p.to;i++){ const cur=(rec.answers.X||[])[i]; const s=el("select",{class:"inl",id:`X${i}`,"aria-label":`Step ${i-p.from+1}`,onchange:e=>setAns("X",i,e.target.value)}, el("option",{value:"",text:"—"}));
+          LETTERS.split("").forEach(L=>s.append(el("option",{value:L,text:L,selected:cur===L}))); row.append(el("label",{for:`X${i}`,class:"row"},`Step ${i-p.from+1}`,s)); }
+        card.append(row);
+      } else for(let i=p.from;i<=p.to;i++) card.append(block(i,sec.qs[i])); });
+  } else sec.qs.forEach((q,i)=>card.append(block(i,q)));
+  if (sec.open?.t){ const ta=el("textarea",{id:"open",placeholder:"Your answer in English…"}); ta.value=rec.answers.open||""; const wc=el("span",{class:"muted"});
+    const upd=()=>wc.textContent=`Слов: ${words(ta.value)}`; ta.addEventListener("input",()=>{ rec.answers.open=ta.value; save(); upd(); }); upd();
+    card.append(el("div",{class:"q"}, el("div",{class:"n",text:`Open question · ${sec.open.max} б. (проверяет преподаватель)`}), el("div",{text:sec.open.t}), ta, wc)); }
+  const idx=SECTIONS.indexOf(sec);
+  card.append(el("div",{class:"row"}, el("button",{type:"button",onclick:()=>go(SECTIONS[idx+1]?.id||"S"),text:SECTIONS[idx+1]?"Следующее задание →":"К отправке →"})));
+  pane.append(card);
+}
+
+function renderSubmit(pane){
+  const miss=[];
+  SECTIONS.forEach(s=>{ const n=s.qs.filter((_,i)=>!(rec.answers[s.id]||[])[i]).length; if(n) miss.push(`${s.title}: без ответа ${n}`); });
+  const order=(rec.answers.X||[]).slice(10,15).filter(Boolean); if(new Set(order).size!==order.length) miss.push("2C: одна буква выбрана дважды");
+  pane.append(el("section",{class:"card"}, el("h2",{text:"Отправка работы"}),
+    miss.length? el("div",{class:"note err"}, el("b",{text:"Проверьте: "}), miss.join("; ")) : el("div",{class:"note",text:"Все задания заполнены."}),
+    el("p",{text:"После отправки изменить ответы нельзя. Когда время закончится, работа отправится автоматически."}),
+    el("label",{class:"row",for:"confirm"}, el("input",{type:"checkbox",id:"confirm",onchange:e=>{$("#send").disabled=!e.target.checked;}}),"Я проверил(а) ответы и готов(а) отправить работу"),
+    el("div",{class:"row"}, el("button",{type:"button",id:"send",disabled:true,onclick:()=>submit(false),text:"Отправить работу"}), el("span",{class:"muted",id:"msg"}))));
+}
+
+async function submit(auto){
+  if (rec.status==="submitted"||rec._sending) return; rec._sending=true;
+  clearInterval(tick); const msg=$("#msg"); msg&&(msg.textContent="Отправляем…");
+  try{
+    const r=await rpc("submit_result",{p:{surname:rec.surname,name:rec.name,grp:rec.group,code:rec.code,answers:rec.answers,started_at:new Date(rec.startedAt).toISOString(),leaves:rec.leaves,auto_submitted:!!auto}});
+    if (r && r.ok===false && r.reason==="duplicate"){ msg&&(msg.textContent="Работа с такими фамилией, именем и группой уже отправлена. Обратитесь к преподавателю."); rec._sending=false; return; }
+    rec.status="submitted"; rec.submittedAt=Date.now(); delete rec._sending; save(); renderDone();
+  }catch(e){ rec._sending=false; msg&&(msg.textContent="Не удалось отправить ("+e.message+"). Проверьте интернет и нажмите ещё раз."); if(auto) setTimeout(()=>submit(true),5000); }
+}
+
+function renderDone(){
+  $("#who").textContent=`${rec.surname} ${rec.name} · ${rec.group}`;
+  main.replaceChildren(el("div",{class:"card"}, el("div",{class:"eyebrow",text:"Работа принята"}), el("h2",{text:"Спасибо, ваши ответы отправлены"}),
+    el("p",{text:"Результаты объявит преподаватель. Эту страницу можно закрыть."}), el("p",{class:"muted",text:"Отправлено: "+new Date(rec.submittedAt).toLocaleString("ru-RU")})));
+}
+
+/* ============================ TEACHER ============================ */
+let PIN="", rows=[], threshold=Number(store.get("olymp_thr"))||0, poll=null;
+const TOTAL = SECTIONS.reduce((s,x)=>s+maxOf(x),0);
+if (!threshold) threshold=Math.round(TOTAL*0.7);
+
+function renderTeacherLogin(){
+  $("#who").textContent="Преподаватель";
+  const f=el("form",{class:"card"}, el("h2",{text:"Вход преподавателя"}),
+    el("label",{class:"f"},"PIN преподавателя", el("input",{type:"password",id:"pin",required:true,autocomplete:"current-password"})),
+    el("div",{class:"row"}, el("button",{type:"submit",text:"Открыть результаты"}), el("span",{class:"muted",id:"pmsg"})));
+  f.addEventListener("submit",async e=>{ e.preventDefault(); PIN=$("#pin").value; $("#pmsg").textContent="Проверяем…";
+    try{ rows=await rpc("get_results",{pin:PIN}); renderTeacher(); }catch(err){ $("#pmsg").textContent="Не удалось войти: "+err.message; } });
+  if(!configured()) f.append(el("div",{class:"note err",text:"Заполните SUPABASE_URL и SUPABASE_ANON_KEY в config.js."}));
+  main.append(f);
+}
+async function refresh(){ try{ rows=await rpc("get_results",{pin:PIN}); draw(); $("#upd").textContent="обновлено "+new Date().toLocaleTimeString("ru-RU"); }catch(e){ $("#upd").textContent="ошибка обновления: "+e.message; } }
+
+function renderTeacher(){
+  $("#app").classList.add("wide"); main.replaceChildren(
+    el("div",{class:"stats",id:"stats"}),
+    el("div",{class:"card"},
+      el("div",{class:"row",style:"justify-content:space-between"}, el("h2",{text:"Результаты участников"}),
+        el("div",{class:"row"},
+          el("label",{class:"row",for:"thr"},"Проходной балл", el("input",{type:"number",id:"thr",min:0,max:TOTAL,value:threshold,style:"width:80px",oninput:e=>{threshold=Number(e.target.value)||0; store.set("olymp_thr",threshold); draw();}}), el("span",{class:"muted",text:"из "+TOTAL})),
+          el("button",{type:"button",class:"ghost",onclick:refresh,text:"Обновить"}),
+          el("button",{type:"button",class:"ghost",onclick:csv,text:"Скачать CSV"}))),
+      el("p",{class:"muted"},"Баллы за закрытые вопросы считает сервер по ключу. Открытый вопрос по видео оцените вручную (0–4). ", el("span",{id:"upd"})),
+      el("div",{class:"scroll"}, el("table",{id:"tbl"})),
+      el("p",{class:"muted",id:"tmsg"})));
+  draw(); poll=setInterval(refresh,20000);
+}
+
+function draw(){
+  const openMax=SECTIONS.find(s=>s.id==="A").open?.t ? SECTIONS.find(s=>s.id==="A").open.max : 0;
+  const data=rows.map(r=>({...r, total:(r.auto_score||0)+(r.open_score||0), needs: openMax>0 && r.open_score==null}))
+    .sort((a,b)=>b.total-a.total||(a.surname||"").localeCompare(b.surname||"","ru"));
+  const avg=data.length?(data.reduce((s,r)=>s+r.total,0)/data.length).toFixed(1):"—";
+  $("#stats").replaceChildren(...[[data.length,"работ отправлено"],[data.filter(r=>r.needs).length,"ждут проверки открытого ответа"],[avg,"средний балл"],[data.filter(r=>!r.needs&&r.total>=threshold).length,`прошли порог ${threshold}`]]
+    .map(([b,s])=>el("div",{class:"stat"}, el("b",{text:String(b)}), el("span",{text:s}))));
+  const t=$("#tbl"); t.replaceChildren(el("tr",{}, ...["№","Участник","Группа","Код",`Grammar /${maxOf(SECTIONS[0])}`,`Logic /${maxOf(SECTIONS[1])}`,`Listening /${SECTIONS[2].qs.length*2}`,`Открытый /${openMax}`,`Итого /${TOTAL}`,"Решение"].map((h,i)=>el("th",{class:i>=4&&i<=8?"num":"",text:h}))));
+  if(!data.length){ t.append(el("tr",{}, el("td",{colspan:10,class:"muted",text:"Пока ни одной отправленной работы."}))); return; }
+  data.forEach((r,i)=>{
+    const sc=r.scores||{};
+    const os=el("input",{type:"number",min:0,max:openMax,class:"oscore","aria-label":"Балл за открытый ответ",value:r.open_score??"",disabled:!openMax});
+    os.addEventListener("change",async()=>{ const v=os.value===""?null:Math.max(0,Math.min(openMax,Math.round(Number(os.value))));
+      try{ await rpc("set_open_score",{pin:PIN,rid:r.id,s:v}); r.open_score=v; draw(); }catch(e){ $("#tmsg").textContent="Не удалось сохранить: "+e.message; } });
+    const flags=[]; if(r.leaves) flags.push(`уходил(а) со вкладки: ${r.leaves}`); if(r.auto_submitted) flags.push("отправлено по таймеру");
+    if(r.started_at&&r.submitted_at) flags.push(`время работы: ${Math.round((new Date(r.submitted_at)-new Date(r.started_at))/60000)} мин`);
+    const a=r.answers||{};
+    const det=el("details",{}, el("summary",{text:"ответы"}), el("div",{class:"answers"},
+      ...["G","X","A"].map(k=>el("div",{text:`${k}: `+(a[k]||[]).map((v,j)=>`${j+1}) ${v||"—"}`).join("; ")})),
+      el("div",{class:"muted",text:flags.join(" · ")||"замечаний нет"}),
+      el("div",{class:"essay",text:a.open||"(открытый ответ пуст)"})));
+    const dec = r.needs ? el("span",{class:"pill wait",text:"проверить"}) : el("span",{class:"pill "+(r.total>=threshold?"ok":"bad"),text:r.total>=threshold?"проходит":"не проходит"});
+    t.append(el("tr",{}, el("td",{class:"num",text:String(i+1)}), el("td",{}, el("div",{text:`${r.surname} ${r.name}`}),det), el("td",{text:r.grp||""}), el("td",{text:r.code||""}),
+      ...["G","X","A"].map(k=>el("td",{class:"num",text:String(sc[k]??0)})), el("td",{class:"num"},os), el("td",{class:"num"},el("b",{text:String(r.total)})), el("td",{},dec)));
+  });
+}
+
+function csv(){
+  const esc=v=>`"${String(v??"").replace(/"/g,'""')}"`;
+  const lines=[["Фамилия","Имя","Группа","Код","Grammar","Logic","Listening","Открытый","Итого","Решение","Уходы со вкладки","Отправлено"].map(esc).join(";")];
+  rows.map(r=>({...r,total:(r.auto_score||0)+(r.open_score||0)})).sort((a,b)=>b.total-a.total).forEach(r=>{ const s=r.scores||{};
+    lines.push([r.surname,r.name,r.grp,r.code,s.G??0,s.X??0,s.A??0,r.open_score??"",r.total,r.total>=threshold?"проходит":"не проходит",r.leaves||0,r.submitted_at?new Date(r.submitted_at).toLocaleString("ru-RU"):""].map(esc).join(";")); });
+  const a=el("a",{href:URL.createObjectURL(new Blob(["﻿"+lines.join("\n")],{type:"text/csv"})),download:"olympiad_results.csv"}); document.body.append(a); a.click(); a.remove();
+}
+if (location.hash === "#teacher") renderTeacherLogin(); else bootStudent();
+addEventListener("hashchange", ()=>location.reload());
+</script>
+</body>
+</html>

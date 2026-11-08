@@ -1,0 +1,116 @@
+-- Олимпиада Business English: хранилище ответов в Supabase.
+-- Выполните весь файл в Supabase → SQL Editor → New query → Run.
+-- ПЕРЕД ЗАПУСКОМ замените 'CHANGE-ME-PIN' на свой PIN преподавателя.
+--
+-- Схема доступа: прямого доступа к таблицам у анонимного ключа нет (RLS без политик).
+-- Студент только отправляет работу через submit_result(); баллы считает сервер по ключу.
+-- Преподаватель читает результаты через get_results(pin).
+
+create extension if not exists pgcrypto;
+
+create table if not exists public.settings (
+  id int primary key default 1 check (id = 1),
+  teacher_pin text not null,
+  answer_key jsonb not null,
+  points jsonb not null
+);
+
+create table if not exists public.results (
+  id uuid primary key default gen_random_uuid(),
+  surname text not null,
+  name text not null,
+  grp text not null,
+  code text,
+  answers jsonb not null,
+  scores jsonb,
+  auto_score int,
+  open_score int,
+  leaves int default 0,
+  auto_submitted boolean default false,
+  started_at timestamptz,
+  submitted_at timestamptz default now()
+);
+create unique index if not exists results_person_uq
+  on public.results (lower(trim(surname)), lower(trim(name)), lower(trim(grp)));
+
+alter table public.settings enable row level security;
+alter table public.results  enable row level security;
+revoke all on public.settings, public.results from anon, authenticated;
+
+insert into public.settings (id, teacher_pin, answer_key, points) values (1, 'CHANGE-ME-PIN',
+ '{
+   "G": ["was prepared","are exported","hasn''t been signed","must","don''t have to","must","can''t have sent","should have placed","will have hired","were being packed","were","to be introduced"],
+   "X": ["As a result","Despite","but","because","Therefore","economy","economical","economist","investment","competitor","B","D","E","A","C"],
+   "A": ["To show that the choice of the place is a puzzle.","There are far fewer visitors per day outside the summer.","about 500 years older.","They found remains of huts at Durrington Walls.","The bluestones travelled about ten times farther than the sarsen stones.","They could organise a large number of workers.","The monument is aligned with the summer and winter solstices.","New technology shows the site is more complex than people thought."]
+ }'::jsonb,
+ '{"G":1,"X":1,"A":2}'::jsonb)
+on conflict (id) do update set answer_key = excluded.answer_key, points = excluded.points;
+
+-- Подсчёт баллов по ключу
+create or replace function public.score_answers(a jsonb) returns jsonb
+language plpgsql stable security definer set search_path = public as $$
+declare k jsonb; pts jsonb; sec text; i int; c int; p int; s jsonb := '{}'; tot int := 0;
+begin
+  select answer_key, points into k, pts from settings where id = 1;
+  for sec in select jsonb_object_keys(k) loop
+    c := 0;
+    for i in 0 .. jsonb_array_length(k -> sec) - 1 loop
+      if lower(trim(coalesce(a -> sec ->> i, ''))) = lower(k -> sec ->> i) then c := c + 1; end if;
+    end loop;
+    p := coalesce((pts ->> sec)::int, 1);
+    s := s || jsonb_build_object(sec, c * p);
+    tot := tot + c * p;
+  end loop;
+  return s || jsonb_build_object('auto', tot);
+end $$;
+
+-- Отправка работы студентом (один раз на фамилию+имя+группу)
+create or replace function public.submit_result(p jsonb) returns jsonb
+language plpgsql volatile security definer set search_path = public as $$
+declare sc jsonb;
+begin
+  if coalesce(trim(p->>'surname'),'') = '' or coalesce(trim(p->>'name'),'') = '' or coalesce(trim(p->>'grp'),'') = '' then
+    raise exception 'surname, name and group are required';
+  end if;
+  if length(p::text) > 20000 then raise exception 'payload too large'; end if;
+  sc := score_answers(p->'answers');
+  insert into results (surname, name, grp, code, answers, scores, auto_score, leaves, auto_submitted, started_at)
+  values (left(trim(p->>'surname'),80), left(trim(p->>'name'),80), left(trim(p->>'grp'),40), left(trim(coalesce(p->>'code','')),40),
+          p->'answers', sc, (sc->>'auto')::int, coalesce((p->>'leaves')::int,0), coalesce((p->>'auto_submitted')::boolean,false),
+          nullif(p->>'started_at','')::timestamptz);
+  return jsonb_build_object('ok', true);
+exception when unique_violation then
+  return jsonb_build_object('ok', false, 'reason', 'duplicate');
+end $$;
+
+-- Чтение результатов преподавателем
+create or replace function public.get_results(pin text) returns setof public.results
+language plpgsql stable security definer set search_path = public as $$
+begin
+  if not exists (select 1 from settings where id = 1 and teacher_pin = pin) then raise exception 'wrong PIN'; end if;
+  return query select * from results order by submitted_at;
+end $$;
+
+-- Балл за открытый ответ (0–4)
+create or replace function public.set_open_score(pin text, rid uuid, s int) returns void
+language plpgsql volatile security definer set search_path = public as $$
+begin
+  if not exists (select 1 from settings where id = 1 and teacher_pin = pin) then raise exception 'wrong PIN'; end if;
+  update results set open_score = case when s is null then null else greatest(0, least(4, s)) end where id = rid;
+end $$;
+
+-- Пересчёт всех работ после правки ключа
+create or replace function public.rescore_all(pin text) returns int
+language plpgsql volatile security definer set search_path = public as $$
+declare n int;
+begin
+  if not exists (select 1 from settings where id = 1 and teacher_pin = pin) then raise exception 'wrong PIN'; end if;
+  update results set scores = score_answers(answers), auto_score = (score_answers(answers)->>'auto')::int;
+  get diagnostics n = row_count; return n;
+end $$;
+
+revoke all on function public.score_answers(jsonb) from public, anon, authenticated;
+grant execute on function public.submit_result(jsonb) to anon;
+grant execute on function public.get_results(text) to anon;
+grant execute on function public.set_open_score(text, uuid, int) to anon;
+grant execute on function public.rescore_all(text) to anon;
