@@ -189,13 +189,12 @@ function renderLogin(){
     el("div",{class:"grid2"},
       el("label",{class:"f"},"Фамилия*", el("input",{type:"text",id:"surname",required:true,autocomplete:"family-name"})),
       el("label",{class:"f"},"Имя*", el("input",{type:"text",id:"fname",required:true,autocomplete:"given-name"})),
-      el("label",{class:"f"},"Группа*", el("input",{type:"text",id:"group",required:true,placeholder:"например, ЭК-11"})),
-      el("label",{class:"f"},"Код участника", el("input",{type:"text",id:"pcode",placeholder:"если выдан"}))),
+      el("label",{class:"f"},"Группа*", el("input",{type:"text",id:"group",required:true,placeholder:"например, ЭК-11"}))),
     el("div",{class:"note",text:"Для аудирования понадобятся наушники. Не закрывайте вкладку без необходимости: черновик хранится в этом браузере."}),
     el("div",{class:"row"}, el("button",{type:"submit",text:"Начать олимпиаду"})));
   f.addEventListener("submit", e=>{ e.preventDefault(); const v=id=>$("#"+id).value.trim();
     const answers={open:""}; SECTIONS.forEach(s=>answers[s.id]=[]);
-    rec={surname:v("surname"),name:v("fname"),group:v("group"),code:v("pcode"),status:"in_progress",startedAt:Date.now(),answers,leaves:0};
+    rec={surname:v("surname"),name:v("fname"),group:v("group"),code:"",status:"in_progress",startedAt:Date.now(),answers,leaves:0};
     store.set(DRAFT,rec); main.replaceChildren(); startExam(); });
   main.append(f);
 }
