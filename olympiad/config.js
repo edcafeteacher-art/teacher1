@@ -3,7 +3,7 @@
 // anon key публичный по замыслу Supabase; доступ к ответам закрыт функциями в supabase/schema.sql.
 window.OLYMPIAD_CONFIG = {
   SUPABASE_URL: "",
-  SUPABASE_ANON_KEY: "",
+  SUPABASE_ANON_KEY: "sb_publishable_K4wXLNZgMuImTCDuyTNESw_mQDHnJDP",
   TIME_LIMIT_MIN: 70,
   // Ссылка на видео для аудирования (YouTube). Пока пусто, участник увидит сообщение.
   VIDEO_URL: "https://youtu.be/L2iFafYw9Yc",
