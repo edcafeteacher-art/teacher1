@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Олимпиада Business English</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0f5e63">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Olympiad">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
@@ -348,6 +354,7 @@ function csv(){
   const a=el("a",{href:URL.createObjectURL(new Blob(["﻿"+lines.join("\n")],{type:"text/csv"})),download:"olympiad_results.csv"}); document.body.append(a); a.click(); a.remove();
 }
 
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").catch(()=>{});
 if (location.hash === "#teacher") renderTeacherLogin(); else bootStudent();
 addEventListener("hashchange", ()=>location.reload());
 </script>
