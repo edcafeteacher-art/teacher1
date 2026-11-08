@@ -54,7 +54,8 @@ body{background-color:var(--bg);background-image:linear-gradient(var(--grid) 1px
 .mast.compact h1{font-size:clamp(24px,3vw,34px);letter-spacing:-.01em}
 .mast.compact .sub{display:none}
 .mast.compact .tools{margin-top:4px}
-.mast canvas{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
+.mast canvas{position:absolute;top:0;bottom:0;right:0;left:auto;width:min(100%,760px);height:100%;z-index:-1}
+.mast.compact canvas{width:min(100%,380px)}
 .mast .wrap{gap:10px;justify-items:start}
 .mast h1{font-family:var(--f-display);font-weight:700;font-size:clamp(36px,6.4vw,76px);line-height:.98;letter-spacing:-.02em;margin:0;text-wrap:balance}
 .mast h1 em{font-style:italic;font-weight:500;color:var(--gold)} /* brand accent word from the approved template */
@@ -94,11 +95,14 @@ button:active:not(:disabled){transform:scale(.97)}
 button.ghost{background:var(--surface-3);color:var(--ink)}
 button:disabled{opacity:.45;cursor:not-allowed}
 .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;min-width:0;flex:1}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;min-width:0;flex:1}
 .tabs::-webkit-scrollbar{display:none}
 .tabs button{flex:none;background:none;color:var(--muted);border-radius:999px;padding:8px 14px;font-weight:500;font-size:14px;display:inline-flex;align-items:center;gap:8px}
 .tabs button:hover:not(:disabled){color:var(--ink);background:var(--surface-3)}
 .tabs button[aria-current="true"]{background:var(--accent);color:var(--accent-ink)}
+.tabs .tn::after{content:"."}
+.tabs .tn{margin-right:-4px}
+@media (max-width:700px){.tabs .tt{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.tabs .tn::after{content:""}.tabs .tn{margin-right:0}.tabs button{padding:8px 11px}}
 .tabs .pip{width:8px;height:8px;border-radius:50%;background:var(--line-strong);transition:background .3s,transform .3s}
 .tabs .pip.done{background:var(--gold);transform:scale(1.25)}
 .q{display:grid;gap:10px;padding-top:6px}
@@ -109,7 +113,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .opts label:has(input:checked){background:var(--gold-soft)}
 .opts input{accent-color:var(--navy);margin-top:5px}
 .text{background:var(--surface-2);border-left:4px solid var(--gold);border-radius:0 4px 4px 0;padding:18px 22px;max-width:72ch;font-family:var(--f-display);font-size:18px;line-height:1.7}
-.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;display:flex;flex-wrap:nowrap;gap:10px;align-items:center;justify-content:space-between;box-shadow:0 8px 16px -14px rgba(11,37,69,.5)} /* sticky bar floats over content. taste-skill-ignore */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;display:flex;flex-wrap:nowrap;gap:10px;align-items:flex-start;justify-content:space-between;box-shadow:0 8px 16px -14px rgba(11,37,69,.5)} /* sticky bar floats over content. taste-skill-ignore */
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 .timer{font-weight:600;font-size:16px;font-variant-numeric:tabular-nums;background:var(--surface);border-radius:999px;padding:7px 14px;white-space:nowrap}
 .timer.low{background:var(--warn-soft);color:var(--bad)}
@@ -279,7 +283,7 @@ function updateTimer(){ const left=rec.startedAt+(CFG.TIME_LIMIT_MIN||70)*60000-
   t.textContent="⏱ "+fmtTime(left); t.classList.toggle("low",left<5*60000); if(left<=0){ clearInterval(tick); submit(true); } }
 function go(id){ current=id; renderTabs(); renderSection(); scrollTo({top:0}); }
 function renderTabs(){ const nav=$("#tabs"); nav.replaceChildren();
-  SECTIONS.forEach(s=>nav.append(el("button",{type:"button","aria-current":String(current===s.id),onclick:()=>go(s.id)}, el("span",{class:"pip"+(isDone(s)?" done":"")}), s.title)));
+  SECTIONS.forEach(s=>nav.append(el("button",{type:"button","aria-current":String(current===s.id),onclick:()=>go(s.id)}, el("span",{class:"pip"+(isDone(s)?" done":"")}), el("span",{class:"tn",text:s.title.split(". ")[0]}), el("span",{class:"tt",text:s.title.slice(s.title.indexOf(". ")+2)}), )));
   updateProgress();
   nav.append(el("button",{type:"button","aria-current":String(current==="S"),onclick:()=>go("S")},"Отправка")); }
 function setAns(sec,i,v){ rec.answers[sec] ||= []; rec.answers[sec][i]=v; save(); updateProgress(); }
@@ -488,9 +492,10 @@ applyTheme();
   let tx=0,ty=0;
   addEventListener("pointermove",e=>{ tx=(e.clientX/innerWidth-.5); ty=(e.clientY/innerHeight-.5); },{passive:true});
   function size(){ const w=c.clientWidth,h=c.clientHeight; if(!w||!h) return; renderer.setSize(w,h,false); cam.aspect=w/h; cam.updateProjectionMatrix();
-    const halfW=Math.tan(cam.fov*Math.PI/360)*cam.position.z*cam.aspect, side=halfW>9;
-    // Wide screens: globe sits to the right of the title. Narrow screens: centred behind the text, dimmed.
-    g.position.set(side?halfW-5.4:0, side?0:-.2, 0); g.scale.setScalar(side?1:.75); c.style.opacity = side?".9":".35"; }
+    // The canvas is its own box on the right, so the globe always sits in the middle of a normal frame (no edge distortion).
+    const compact=c.parentElement.classList.contains("compact"), narrow=w<600;
+    g.position.set(0, compact?0:(narrow?-.2:0), 0); g.scale.setScalar(compact?.85:(narrow?.75:1));
+    c.style.opacity = innerWidth<700 ? ".35" : ".95"; }
   addEventListener("resize",size); size(); new ResizeObserver(size).observe(c);
   const t0=performance.now();
   function frame(now){ const t=(now-t0)/1000;
