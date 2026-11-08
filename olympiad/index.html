@@ -256,7 +256,7 @@ function renderSection(){
       card.append(el("div",{class:"q"}, el("div",{class:"n",text:`${i+1}`}), el("div",{text:q.t}), box)); });
     if (sec.open?.t){ const ta=el("textarea",{id:"open",placeholder:"Your answer in English…"}); ta.value=rec.answers.open||""; const wc=el("span",{class:"muted"});
       const upd=()=>wc.textContent=`Слов: ${words(ta.value)}`; ta.addEventListener("input",()=>{ rec.answers.open=ta.value; save(); upd(); }); upd();
-      card.append(el("div",{class:"q"}, el("div",{class:"n",text:`Open question · ${sec.open.max} б. (проверяет преподаватель)`}), el("div",{text:sec.open.t}), ta, wc)); }
+      card.append(el("div",{class:"q"}, el("div",{class:"n",text:`Open question · ${sec.open.max} б. (объём 40–60 слов, две выгоды и один риск)`}), el("div",{text:sec.open.t}), ta, wc)); }
   }
   const idx=SECTIONS.indexOf(sec);
   card.append(el("div",{class:"row"}, el("button",{type:"button",onclick:()=>go(SECTIONS[idx+1]?.id||"S"),text:SECTIONS[idx+1]?"Следующее задание →":"К отправке →"})));
