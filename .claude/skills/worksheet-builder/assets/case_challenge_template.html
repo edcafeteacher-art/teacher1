@@ -1,0 +1,997 @@
+<title>Tax Risk Case Challenge</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: navy masthead on a ruled grid ground; sticky tab rail; case brief beside a pair workspace */
+:root{
+  --bg:#e9eef4; --grid:rgba(11,37,69,.055); --surface:#ffffff; --surface-2:#f4f7fb;
+  --ink:#0d1c31; --muted:#4f6079; --line:#d5dde8; --line-strong:#b9c6d6;
+  --navy:#0b2545; --navy-ink:#f3f6fb; --navy-muted:#a9bad1; --accent:#0f2f57; --accent-ink:#ffffff;
+  --gold:#c9a24a; --gold-ink:#7a5c17; --gold-soft:rgba(201,162,74,.14); --gold-line:rgba(201,162,74,.55);
+  --ok:#2c7a57; --ok-soft:rgba(44,122,87,.12); --warn:#a8671c; --warn-soft:rgba(168,103,28,.12);
+  --shadow:0 1px 0 rgba(11,37,69,.05),0 10px 24px -14px rgba(11,37,69,.35);
+  --il-bg:#e3eaf2; --il-ground:#c7d4e0; --il-navy:#1b324f; --il-blue:#3e7799; --il-teal:#6aa89a; --il-gold:#e3b357; --il-white:#ffffff; --il-orb:#d2e0ea;
+  --f-display:"Spectral",Georgia,"Times New Roman",serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#050b16; --grid:rgba(226,192,109,.055); --surface:#0b1527; --surface-2:#0f1c33;
+  --ink:#e7ecf3; --muted:#97a7bd; --line:#1c2b44; --line-strong:#2b3d5b;
+  --navy:#081a33; --navy-ink:#f1f4f9; --navy-muted:#93a6c2; --accent:#9cbde6; --accent-ink:#06101f;
+  --gold:#e2c06d; --gold-ink:#e2c06d; --gold-soft:rgba(226,192,109,.12); --gold-line:rgba(226,192,109,.5);
+  --ok:#6fcf9f; --ok-soft:rgba(111,207,159,.12); --warn:#e8b067; --warn-soft:rgba(232,176,103,.12);
+  --shadow:0 1px 0 rgba(0,0,0,.4),0 14px 30px -16px rgba(0,0,0,.8);
+  --il-bg:#0f1d34; --il-ground:#1d3050; --il-navy:#cfdbeb; --il-blue:#5d97bd; --il-teal:#6fb3a3; --il-gold:#e2c06d; --il-white:#0b1527; --il-orb:#152845;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#050b16; --grid:rgba(226,192,109,.055); --surface:#0b1527; --surface-2:#0f1c33;
+  --ink:#e7ecf3; --muted:#97a7bd; --line:#1c2b44; --line-strong:#2b3d5b;
+  --navy:#081a33; --navy-ink:#f1f4f9; --navy-muted:#93a6c2; --accent:#9cbde6; --accent-ink:#06101f;
+  --gold:#e2c06d; --gold-ink:#e2c06d; --gold-soft:rgba(226,192,109,.12); --gold-line:rgba(226,192,109,.5);
+  --ok:#6fcf9f; --ok-soft:rgba(111,207,159,.12); --warn:#e8b067; --warn-soft:rgba(232,176,103,.12);
+  --shadow:0 1px 0 rgba(0,0,0,.4),0 14px 30px -16px rgba(0,0,0,.8);
+  --il-bg:#0f1d34; --il-ground:#1d3050; --il-navy:#cfdbeb; --il-blue:#5d97bd; --il-teal:#6fb3a3; --il-gold:#e2c06d; --il-white:#0b1527; --il-orb:#152845;
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background-color:var(--bg);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px;color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--navy)}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1180px;margin:0 auto}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+/* Masthead */
+.mast{background:var(--navy);color:var(--navy-ink);text-align:center;padding-block:34px 30px;border-bottom:3px double var(--gold)}
+.mast .eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.mast h1{font-family:var(--f-display);font-weight:700;font-size:clamp(30px,5vw,48px);line-height:1.08;margin:.3em 0 .25em;text-wrap:balance;letter-spacing:.005em}
+.mast h1 em{font-style:italic;font-weight:500;color:var(--gold)}
+.mast p{margin:0 auto;max-width:62ch;color:var(--navy-muted);font-size:15px}
+
+/* Rail */
+.rail{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line);box-shadow:0 6px 18px -16px rgba(0,0,0,.6)}
+.rail .wrap{display:flex;align-items:center;gap:12px;min-height:56px}
+.tabs{display:flex;gap:4px;overflow-x:auto;flex:1;min-width:0;scrollbar-width:none;padding-block:8px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;border:1px solid transparent;background:none;border-radius:999px;padding:7px 13px;font-size:13.5px;font-weight:500;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:7px;white-space:nowrap}
+.tab:hover{color:var(--ink);background:var(--surface-2)}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.tab .pip{width:7px;height:7px;border-radius:50%;background:var(--line-strong)}
+.tab .pip.part{background:var(--warn)} .tab .pip.done{background:var(--ok)}
+.tab .mine{font-size:10px;letter-spacing:.08em;text-transform:uppercase;background:var(--gold);color:#0b2545;border-radius:4px;padding:1px 5px;font-weight:600}
+.rail-tools{display:flex;gap:8px;flex:none}
+.chip-btn{display:flex;align-items:center;gap:7px;border:1px solid var(--line-strong);background:var(--surface);border-radius:999px;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:500}
+.chip-btn:hover{border-color:var(--gold)}
+.chip-btn .t{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:13.5px}
+.chip-btn.running .t{color:var(--gold-ink)}
+.chip-btn.ending{border-color:var(--warn);color:var(--warn)}
+.chip-btn.over{background:var(--warn);color:#fff;border-color:var(--warn);animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.6}}
+.chip-btn svg{width:16px;height:16px}
+
+main{padding-block:28px 64px}
+.view[hidden]{display:none!important}
+
+/* Section heading with double gold rule */
+.sh{font-family:var(--f-body);font-size:12.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:0 0 14px;display:flex;align-items:center;gap:12px}
+.sh::after{content:"";flex:1;height:4px;border-top:1px solid var(--gold-line);border-bottom:1px solid var(--gold-line)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:22px;box-shadow:var(--shadow);min-width:0}
+.stack{display:grid;gap:22px}
+
+/* Brief page */
+.brief-grid{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:22px;align-items:start}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.steps li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.steps li:last-child{border-bottom:0}
+.steps .n{font-family:var(--f-display);font-size:26px;font-weight:600;color:var(--gold-ink);line-height:1}
+.steps b{display:block;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink)}
+.steps span{color:var(--muted);font-size:14.5px}
+.req{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.req li{display:flex;gap:10px;align-items:flex-start;font-size:14.5px}
+.req li::before{content:"";flex:none;width:8px;height:8px;margin-top:8px;transform:rotate(45deg);background:var(--gold)}
+.note{margin-top:16px;padding:12px 14px;border-left:3px solid var(--gold);background:var(--gold-soft);font-size:14px;border-radius:0 6px 6px 0}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.inp{display:grid;gap:5px}
+.inp label{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+input[type=text],input[type=number],select,textarea{width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:7px;padding:9px 11px;font-size:14.5px;line-height:1.5;transition:border-color .15s,background .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);background:var(--surface)}
+textarea{resize:vertical;min-height:64px}
+.case-pick{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:4px}
+.case-pick button{border:1px solid var(--line-strong);background:var(--surface-2);border-radius:8px;padding:9px 4px;cursor:pointer;font-family:var(--f-display);font-size:18px;font-weight:600}
+.case-pick button[aria-pressed="true"]{background:var(--navy);color:var(--gold);border-color:var(--navy)}
+.cases-index{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.ci{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:14px 16px;cursor:pointer;display:grid;gap:4px;box-shadow:var(--shadow)}
+.ci:hover{border-color:var(--gold)}
+.ci .k{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-ink);font-weight:600}
+.ci .h{font-family:var(--f-display);font-size:18px;font-weight:600;line-height:1.25}
+.ci .m{font-size:12.5px;color:var(--muted)}
+.retell{display:grid;gap:10px}
+
+/* Case view */
+.case-head{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:22px;align-items:center;margin-bottom:22px}
+.case-head .k{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-ink);font-weight:600}
+.case-head h2{font-family:var(--f-display);font-size:clamp(26px,3.6vw,38px);line-height:1.1;margin:.2em 0 .3em;text-wrap:balance}
+.case-head .tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:12px;border:1px solid var(--line-strong);border-radius:999px;padding:2px 10px;color:var(--muted)}
+.illo{border-radius:12px;overflow:hidden;border:1px solid var(--line);background:var(--il-bg)}
+.illo svg{display:block;width:100%;height:auto}
+.case-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:22px;align-items:start}
+.brief-col{position:sticky;top:calc(env(safe-area-inset-top,0px) + 72px)}
+.situ{font-family:var(--f-display);font-size:17px;line-height:1.6;margin:0 0 14px}
+.role{display:flex;gap:10px;align-items:baseline;padding:10px 12px;background:var(--surface-2);border-radius:8px;font-size:14px;margin-bottom:18px}
+.role b{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);flex:none}
+.tasks{list-style:none;margin:0 0 18px;padding:0;display:grid;gap:6px}
+.tasks label{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;align-items:start;cursor:pointer;font-size:14.5px;padding:4px 0}
+.tasks input{margin-top:4px;accent-color:var(--gold);width:16px;height:16px}
+.tasks input:checked + span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--gold)}
+.sc{padding:12px 14px;border:1px solid var(--gold-line);background:var(--gold-soft);border-radius:8px;font-size:14px;margin-bottom:18px}
+.sc b{display:block;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-ink);margin-bottom:3px}
+.tv{display:flex;flex-wrap:wrap;gap:6px}
+.tv button{border:1px solid var(--line-strong);background:var(--surface);border-radius:6px;padding:4px 9px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px}
+.tv button:hover{border-color:var(--gold)}
+.tv button.used{background:var(--gold-soft);border-color:var(--gold);color:var(--ink)}
+.tv button.used::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold)}
+.small{font-size:12.5px;color:var(--muted)}
+
+/* Levels */
+.lvl{display:inline-flex;border:1px solid var(--line-strong);border-radius:999px;overflow:hidden;margin-top:12px}
+.lvl button{border:0;background:var(--surface);padding:6px 14px;font-size:13px;font-weight:500;cursor:pointer;color:var(--muted)}
+.lvl button+button{border-left:1px solid var(--line)}
+.lvl button[aria-pressed="true"]{background:var(--navy);color:var(--gold)}
+.facts{margin:0 0 18px;padding:12px 14px;border:1px solid var(--line);border-left:3px solid var(--accent);background:var(--surface-2);border-radius:0 8px 8px 0}
+.facts b{display:block;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.facts ul{margin:0;padding-left:18px;display:grid;gap:4px;font-size:14px}
+.tab .lv{font-size:10px;font-weight:600;border:1px solid currentColor;border-radius:4px;padding:0 4px;opacity:.8}
+
+/* Workspace */
+.meter{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:center}
+.ring{position:relative;width:88px;height:88px}
+.ring svg{width:88px;height:88px;transform:rotate(-90deg)}
+.ring .num{position:absolute;inset:0;display:grid;place-items:center;text-align:center;font-family:var(--f-display);font-weight:700;font-size:26px;line-height:1}
+.ring .num small{display:block;font-family:var(--f-body);font-size:10.5px;font-weight:500;color:var(--muted);letter-spacing:.06em;margin-top:2px}
+.checks{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:4px 14px}
+.checks li{display:flex;gap:7px;align-items:center;font-size:13px;color:var(--muted)}
+.checks li i{flex:none;width:15px;height:15px;border-radius:50%;border:1.5px solid var(--line-strong);display:grid;place-items:center}
+.checks li.ok{color:var(--ink)} .checks li.ok i{background:var(--ok);border-color:var(--ok)}
+.checks li.ok i::after{content:"";width:6px;height:3px;border-left:1.5px solid #fff;border-bottom:1.5px solid #fff;transform:rotate(-45deg) translate(1px,-1px)}
+.used-list{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}
+.used-list span{font-size:12px;background:var(--surface-2);border:1px solid var(--line);border-radius:4px;padding:1px 7px}
+.pair-line{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--muted);margin-bottom:14px}
+.pair-line .who{display:inline-flex;align-items:center;gap:6px;color:var(--ink)}
+.badge{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:5px;font-size:11px;font-weight:600}
+.badge.A{background:var(--accent);color:var(--accent-ink)} .badge.B{background:var(--gold);color:#0b2545}
+.fields{display:grid;gap:14px}
+.fgroup{display:grid;gap:12px}
+.fgroup.two{grid-template-columns:1fr 1fr}
+.field{display:grid;gap:6px;min-width:0}
+.field.rec{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--gold);border-radius:8px;padding:12px 12px 10px;box-shadow:var(--shadow)}
+.fhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.fhead label{font-weight:600;font-size:13.5px;flex:1;min-width:0}
+.fhead .hint{display:block;font-weight:400;color:var(--muted);font-size:12.5px}
+.spk{display:inline-flex;border:1px solid var(--line-strong);border-radius:6px;overflow:hidden}
+.spk button{border:0;background:none;padding:2px 8px;font-size:11.5px;font-weight:600;cursor:pointer;color:var(--muted)}
+.spk button[aria-pressed="true"].a{background:var(--accent);color:var(--accent-ink)}
+.spk button[aria-pressed="true"].b{background:var(--gold);color:#0b2545}
+.wc{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:48px;text-align:right}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.btn{border:1px solid var(--line-strong);background:var(--surface);border-radius:7px;padding:8px 14px;font-size:13.5px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.btn:hover{border-color:var(--gold)}
+.btn.primary{background:var(--navy);color:var(--navy-ink);border-color:var(--navy)}
+:root[data-theme="dark"] .btn.primary{background:var(--gold);color:#0b2545;border-color:var(--gold)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{background:var(--gold);color:#0b2545;border-color:var(--gold)}}
+.btn.danger{color:var(--warn)}
+.btn.confirm{background:var(--warn);color:#fff;border-color:var(--warn)}
+
+/* Toolkit */
+.kit-tabs{display:flex;gap:4px;margin-bottom:12px}
+.kit-tabs button{border:1px solid var(--line);background:var(--surface-2);border-radius:6px;padding:5px 12px;font-size:13px;cursor:pointer}
+.kit-tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.kit-body{max-height:340px;overflow:auto;border-top:1px solid var(--line);padding-top:10px}
+.ph-group{margin-bottom:12px}
+.ph-group h4{margin:0 0 6px;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-ink)}
+.ph{display:block;width:100%;text-align:left;border:0;background:none;padding:5px 8px;border-radius:5px;font-size:13.5px;cursor:pointer;font-family:var(--f-display)}
+.ph:hover{background:var(--gold-soft)}
+.kit-search{margin-bottom:8px}
+.g-mini{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:4px}
+.g-mini button{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:5px;padding:5px 8px;font-size:12.5px;cursor:pointer}
+.g-mini button:hover{border-color:var(--gold)}
+.g-mini button small{display:block;color:var(--muted);font-size:11px}
+
+/* Rubric */
+.rub-grid{display:grid;grid-template-columns:minmax(0,8fr) minmax(0,4fr);gap:22px;align-items:start}
+.crit{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 18px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.crit:last-of-type{border-bottom:0}
+.crit h3{margin:0;font-family:var(--f-display);font-size:17px;font-weight:600}
+.crit p{margin:2px 0 0;font-size:13.5px;color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:8px;overflow:hidden}
+.seg button{width:38px;height:36px;border:0;border-left:1px solid var(--line);background:var(--surface);cursor:pointer;font-family:var(--f-mono);font-size:14px;font-variant-numeric:tabular-nums}
+.seg button:first-child{border-left:0}
+.seg button:hover{background:var(--gold-soft)}
+.seg button[aria-pressed="true"]{background:var(--navy);color:var(--gold)}
+.crit .band{grid-column:1/-1;font-size:12.5px;color:var(--muted);min-height:1em}
+.total{text-align:center;padding:18px;border-radius:10px;background:var(--navy);color:var(--navy-ink);border:1px solid var(--gold-line)}
+.total .v{font-family:var(--f-display);font-size:56px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.total .v span{font-size:22px;color:var(--navy-muted);font-weight:500}
+.total .lbl{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.bar{height:6px;border-radius:3px;background:rgba(255,255,255,.14);margin-top:12px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--gold);width:0;transition:width .3s}
+.guide{width:100%;border-collapse:collapse;font-size:13px}
+.guide td{padding:6px 4px;border-bottom:1px solid var(--line);vertical-align:top}
+.guide td:first-child{font-family:var(--f-display);font-weight:700;font-size:16px;width:32px;color:var(--gold-ink)}
+
+/* Vocabulary heard (rubric) */
+.vt{margin:18px 0 6px;padding:16px;border:1px solid var(--line);border-top:3px solid var(--gold);border-radius:10px;background:var(--surface-2)}
+.vt-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.vt-title{margin:0;font-family:var(--f-display);font-size:18px;font-weight:600}
+.vt-count{flex:none;display:flex;align-items:baseline;gap:4px;font-variant-numeric:tabular-nums}
+.vt-count b{font-family:var(--f-display);font-size:34px;line-height:1;color:var(--gold-ink)}
+.vt-count span{color:var(--muted);font-size:14px}
+.vt-count.ok b{color:var(--ok)}
+.vt-bar{height:5px;border-radius:3px;background:var(--line);margin:10px 0 14px;overflow:hidden}
+.vt-bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .25s}
+.vt-bar.ok i{background:var(--ok)}
+.vt-label{font-size:11.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.vt-active{min-height:34px}
+.vt-active button{background:var(--surface)}
+.vt-active button.extra{border-style:dashed}
+.vt-active button.extra small{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.vt-all{max-height:220px;overflow:auto;padding-right:2px}
+textarea::placeholder,input::placeholder{color:var(--muted);opacity:.7}
+
+/* Glossary */
+.gl-tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.gl-tools input{flex:1;min-width:200px}
+.tbl-wrap{overflow-x:auto}
+.gl{width:100%;border-collapse:collapse;font-size:14.5px}
+.gl th{text-align:left;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:8px 10px;border-bottom:2px solid var(--gold-line)}
+.gl td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.gl td.n{font-family:var(--f-mono);color:var(--muted);width:44px;font-size:12.5px;font-variant-numeric:tabular-nums}
+.gl td.en{font-family:var(--f-display);font-weight:600;font-size:16px}
+.gl td.ru{color:var(--muted)}
+.gl td.c{width:80px;text-align:right}
+.gl tr.hit td.en::after{content:"used";margin-left:8px;font-family:var(--f-body);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;background:var(--gold-soft);color:var(--gold-ink);border:1px solid var(--gold-line);border-radius:4px;padding:0 5px;vertical-align:middle}
+.mini{border:1px solid var(--line);background:var(--surface-2);border-radius:5px;padding:3px 9px;font-size:12px;cursor:pointer}
+.mini:hover{border-color:var(--gold)}
+
+/* Timer panel */
+.timer-panel{position:fixed;z-index:40;right:max(16px,env(safe-area-inset-right,0px));top:calc(env(safe-area-inset-top,0px) + 66px);width:300px;max-width:calc(100vw - 32px);background:var(--surface);border:1px solid var(--line-strong);border-top:3px solid var(--gold);border-radius:10px;box-shadow:var(--shadow);padding:16px}
+.timer-panel .big{font-family:var(--f-mono);font-size:44px;text-align:center;font-variant-numeric:tabular-nums;line-height:1.1;margin:4px 0 2px}
+.timer-panel .mode{text-align:center;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-ink);min-height:1.2em}
+.presets{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:12px 0}
+.custom{display:flex;gap:6px;align-items:center;margin-bottom:12px;font-size:13px}
+.custom input{width:72px}
+.tp-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+
+/* Toast + fallback */
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateX(-50%);background:var(--navy);color:var(--navy-ink);border:1px solid var(--gold-line);padding:9px 16px;border-radius:8px;font-size:13.5px;z-index:60;box-shadow:var(--shadow)}
+.modal{position:fixed;inset:0;z-index:70;background:rgba(5,11,22,.55);display:grid;place-items:center;padding:16px}
+.modal .box{background:var(--surface);border-radius:10px;padding:18px;width:min(640px,100%);display:grid;gap:10px}
+.modal textarea{min-height:260px;font-family:var(--f-mono);font-size:12.5px}
+
+footer{text-align:center;font-size:12px;color:var(--muted);padding-block:0 30px;letter-spacing:.08em}
+
+@media (max-width:900px){
+  .brief-grid,.case-grid,.rub-grid{grid-template-columns:minmax(0,1fr)}
+  .brief-col{position:static}
+  .case-head{grid-template-columns:minmax(0,1fr)}
+  .case-head .illo{max-width:420px}
+}
+@media (max-width:560px){
+  .form-row,.fgroup.two,.checks{grid-template-columns:minmax(0,1fr)}
+  .panel{padding:16px}
+  .case-pick button{font-size:16px}
+  .crit{grid-template-columns:minmax(0,1fr)}
+  .seg button{width:34px}
+  .chip-btn .lbl{display:none}
+  .meter{grid-template-columns:minmax(0,1fr);justify-items:start}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<header class="mast gut">
+  <div class="wrap">
+    <div class="eyebrow">Practical Session 42 · Year 3 Finance · Role Play</div>
+    <h1>Tax Risk <em>Case Challenge</em></h1>
+    <p>Meet the auditor, analyse a company’s tax risks, and agree on a strategy to reduce them, using vocabulary from the glossary.</p>
+  </div>
+</header>
+
+<nav class="rail gut" aria-label="Sections">
+  <div class="wrap">
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div class="rail-tools">
+      <button class="chip-btn" id="timerChip" aria-expanded="false" aria-controls="timerPanel" title="Timer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>
+        <span class="t" id="timerChipT">15:00</span>
+      </button>
+      <button class="chip-btn" id="themeBtn" title="Switch light or dark theme" aria-label="Switch light or dark theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5Z"/></svg>
+        <span class="lbl" id="themeLbl">Dark</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="timer-panel" id="timerPanel" hidden>
+  <div class="mode" id="tMode">Preparation</div>
+  <div class="big" id="tBig">15:00</div>
+  <div class="presets">
+    <button class="btn" data-preset="900" data-mode="Preparation">Prep · 15 min</button>
+    <button class="btn" data-preset="1200" data-mode="Preparation">Prep · 20 min</button>
+    <button class="btn" data-preset="180" data-mode="Presentation">Talk · 3 min</button>
+    <button class="btn" data-preset="300" data-mode="Presentation">Talk · 5 min</button>
+  </div>
+  <div class="custom"><label for="tCustom">Custom</label><input type="number" id="tCustom" min="1" max="90" value="10"><span>min</span><button class="btn" id="tSet">Set</button></div>
+  <div class="tp-actions">
+    <button class="btn primary" id="tStart">Start</button>
+    <button class="btn" id="tReset">Reset</button>
+  </div>
+</div>
+
+<main class="gut">
+  <div class="wrap">
+
+    <!-- BRIEF -->
+    <section class="view" id="v-brief" aria-label="Session brief">
+      <div class="brief-grid">
+        <div class="stack">
+          <div class="panel">
+            <h2 class="sh">How the session works</h2>
+            <ol class="steps">
+              <li><span class="n">1</span><div><b>Text retelling</b><span>Retell the text on the Russian tax system, tax accounting, and filing a tax return to your teacher.</span></div></li>
+              <li><span class="n">2</span><div><b>Case and level</b><span>Your teacher tells your pair which case to develop and at which level, A with support or B standard.</span></div></li>
+              <li><span class="n">3</span><div><b>Pair preparation</b><span>Partner A plays the company. Partner B plays the auditor. Analyse the risks, agree on measures, and choose glossary items.</span></div></li>
+              <li><span class="n">4</span><div><b>Meeting with the auditor</b><span>Act out the meeting in English. The auditor names the risks, the client responds, and together you agree on an action plan.</span></div></li>
+              <li><span class="n">5</span><div><b>Peer assessment</b><span>A student from another pair assesses your role play using the rubric.</span></div></li>
+              <li><span class="n">6</span><div><b>Teacher feedback</b><span>The teacher gives the final mark and one recommendation for improvement.</span></div></li>
+            </ol>
+          </div>
+          <div class="panel">
+            <h2 class="sh">Presentation requirements</h2>
+            <ul class="req">
+              <li>Name the main tax risk of the company.</li>
+              <li>Explain at least two reasons for this risk.</li>
+              <li>Propose at least three practical measures and agree who does what.</li>
+              <li>Explain how the measures will reduce the tax risk.</li>
+              <li>Use at least 8 vocabulary items from the glossary accurately and appropriately.</li>
+              <li>Rates, thresholds, and deadlines must match the lesson text.</li>
+              <li>Both partners must speak. Use notes if necessary, but do not simply read a prepared text.</li>
+            </ul>
+            <div class="note"><b>Important.</b> All companies and people in the cases are fictional. Level A gives you key facts and sentence starters. Level B gives you more complex tasks and no starters.</div>
+          </div>
+          <div class="panel">
+            <h2 class="sh">The five cases</h2>
+            <div class="cases-index" id="casesIndex"></div>
+          </div>
+        </div>
+        <div class="stack">
+          <div class="panel">
+            <h2 class="sh">Your pair</h2>
+            <div class="fields">
+              <div class="form-row">
+                <div class="inp"><label for="pA">Partner A</label><input type="text" id="pA" placeholder="Name Surname" autocomplete="off"></div>
+                <div class="inp"><label for="pB">Partner B</label><input type="text" id="pB" placeholder="Name Surname" autocomplete="off"></div>
+              </div>
+              <div class="inp"><label for="pG">Group</label><input type="text" id="pG" placeholder="e.g. 24ОФ-1" autocomplete="off"></div>
+              <div class="inp"><span class="small" style="font-weight:600;letter-spacing:.06em;text-transform:uppercase">Case assigned by the teacher</span>
+                <div class="case-pick" id="casePick" role="group" aria-label="Assigned case"></div>
+              </div>
+              <button class="btn primary" id="goMine" hidden>Open our case</button>
+            </div>
+          </div>
+          <div class="panel">
+            <h2 class="sh">Retelling notes</h2>
+            <p class="small" style="margin:0 0 12px">Key words only, not full sentences. Retell from memory.</p>
+            <div class="retell">
+              <div class="inp"><label for="rRU">Tax system and regimes</label><textarea id="rRU" rows="2" placeholder="e.g. Tax Code, three levels, VAT 22 percent, USN…"></textarea></div>
+              <div class="inp"><label for="rUS">Tax accounting and reporting</label><textarea id="rUS" rows="2" placeholder="e.g. primary documents, tax registers, single tax account…"></textarea></div>
+              <div class="inp"><label for="rCN">Filing a return and tax risks</label><textarea id="rCN" rows="2" placeholder="e.g. 25 March, 25th day, 30 April, desk tax audit, auditor…"></textarea></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CASES (rendered) -->
+    <div id="caseViews"></div>
+
+    <!-- RUBRIC -->
+    <section class="view" id="v-rubric" aria-label="Peer assessment rubric" hidden>
+      <div class="rub-grid">
+        <div class="panel">
+          <h2 class="sh">Peer assessment rubric</h2>
+          <p class="small" style="margin:-4px 0 16px">Listen to another pair's presentation. Score each criterion from 0 to 5. Give evidence in your comments.</p>
+          <div class="form-row" style="margin-bottom:8px">
+            <div class="inp"><label for="rbPair">Presenting pair</label><input type="text" id="rbPair" placeholder="Names" autocomplete="off"></div>
+            <div class="inp"><label for="rbCase">Case</label><select id="rbCase"><option value="">Choose…</option></select></div>
+          </div>
+          <div class="inp" style="margin-bottom:6px"><label for="rbAssessor">Peer assessor</label><input type="text" id="rbAssessor" placeholder="Your name" autocomplete="off"></div>
+          <div class="vt">
+            <div class="vt-head">
+              <div><h3 class="vt-title">Vocabulary heard</h3><p class="small" style="margin:2px 0 0">Listen and tap each glossary word the pair uses. Tap again to undo.</p></div>
+              <div class="vt-count"><b id="vtN">0</b><span>/ 8</span></div>
+            </div>
+            <div class="vt-bar"><i id="vtBar"></i></div>
+            <div class="vt-label">Active vocabulary · <span id="vtCaseName">choose the case above</span></div>
+            <div class="tv vt-active" id="vtActive"></div>
+            <div class="vt-label" style="margin-top:14px">Full glossary · tap a word that is not in the active box to add it there</div>
+            <input type="text" id="vtSearch" placeholder="Search the glossary" aria-label="Search the full glossary" autocomplete="off" style="margin-bottom:8px">
+            <div class="g-mini vt-all" id="vtAll"></div>
+          </div>
+          <div id="crits"></div>
+          <div class="form-row" style="margin-top:14px">
+            <div class="inp"><label for="rbStrength">One strength</label><textarea id="rbStrength" rows="5" placeholder="Examples:&#10;You used the terms 'input VAT' and 'desk tax audit' accurately.&#10;The auditor explained each risk with a clear reason.&#10;Both of you spoke and you used notes, not a written text."></textarea></div>
+            <div class="inp"><label for="rbSuggest">One suggestion</label><textarea id="rbSuggest" rows="5" placeholder="Examples:&#10;Check the deadline you gave for the VAT return against the text.&#10;The client could ask more questions instead of only agreeing.&#10;Look at the audience more and read less from your notes."></textarea></div>
+          </div>
+          <div class="actions" style="margin-top:16px">
+            <button class="btn primary" id="rbCopy">Copy assessment</button>
+            <button class="btn danger" id="rbClear">Clear rubric</button>
+          </div>
+        </div>
+        <div class="stack">
+          <div class="total">
+            <div class="lbl">Total</div>
+            <div class="v"><b id="rbTotal">0</b><span> / 25</span></div>
+            <div class="bar"><i id="rbBar"></i></div>
+          </div>
+          <div class="panel">
+            <h2 class="sh">Scoring guide</h2>
+            <table class="guide"><tbody>
+              <tr><td>5</td><td>Fully and convincingly demonstrated</td></tr>
+              <tr><td>4</td><td>Good performance; minor weaknesses</td></tr>
+              <tr><td>3</td><td>Acceptable, but some elements need development</td></tr>
+              <tr><td>2</td><td>Significant gaps</td></tr>
+              <tr><td>1</td><td>Criterion is minimally demonstrated</td></tr>
+              <tr><td>0</td><td>Evidence is absent</td></tr>
+            </tbody></table>
+          </div>
+          <div class="panel">
+            <h2 class="sh">Teacher's final feedback</h2>
+            <div class="fields">
+              <div class="inp"><label for="tfMark">Final mark (out of 25)</label><input type="number" id="tfMark" min="0" max="25" inputmode="numeric"></div>
+              <div class="inp"><label for="tfStrength">Strength</label><textarea id="tfStrength" rows="2"></textarea></div>
+              <div class="inp"><label for="tfNext">Next step</label><textarea id="tfNext" rows="2"></textarea></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GLOSSARY -->
+    <section class="view" id="v-glossary" aria-label="Glossary" hidden>
+      <div class="panel">
+        <h2 class="sh">Glossary for independent study</h2>
+        <p class="small" style="margin:-4px 0 14px">Study the vocabulary independently. Choose relevant terms and use them meaningfully. Items your pair has already used in your case notes are marked.</p>
+        <div class="gl-tools">
+          <input type="text" id="glSearch" placeholder="Search in English or Russian" autocomplete="off" aria-label="Search glossary">
+          <span class="small" id="glCount"></span>
+        </div>
+        <div class="tbl-wrap">
+          <table class="gl"><thead><tr><th>#</th><th>English</th><th>Russian</th><th></th></tr></thead><tbody id="glBody"></tbody></table>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+<footer class="gut">TAX RISK · CASE CHALLENGE · Notes stay in this browser only</footer>
+
+<div class="toast" id="toast" hidden></div>
+<div class="modal" id="modal" hidden>
+  <div class="box">
+    <b>Copy this text</b>
+    <span class="small">Automatic copying is blocked here. The text is selected: press Ctrl+C (or Cmd+C).</span>
+    <textarea id="modalText" readonly aria-label="Text to copy"></textarea>
+    <button class="btn" id="modalClose">Close</button>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- Data ---------- */
+const GLOSSARY = [
+["Tax Code","Налоговый кодекс"],["federal, regional, and local taxes","федеральные, региональные и местные налоги"],["taxpayer","налогоплательщик"],["tax base","налоговая база"],["tax rate","налоговая ставка"],["Federal Tax Service (FNS)","Федеральная налоговая служба (ФНС)"],["tax regime","режим налогообложения"],["general tax regime","общая система налогообложения (ОСНО)"],["simplified tax system (USN)","упрощённая система налогообложения (УСН)"],["value added tax (VAT)","налог на добавленную стоимость (НДС)"],["input VAT","входящий НДС"],["personal income tax","налог на доходы физических лиц (НДФЛ)"],["tax accounting","налоговый учёт"],["primary documents","первичные учётные документы"],["tax register","налоговый регистр"],["tax return","налоговая декларация"],["single tax account (ENS)","единый налоговый счёт (ЕНС)"],["single tax payment","единый налоговый платёж (ЕНП)"],["notification of calculated tax","уведомление об исчисленных суммах налогов"],["advance payment","авансовый платёж"],["electronic document flow","электронный документооборот (ЭДО)"],["tax deduction","налоговый вычет"],["taxpayer’s personal account","личный кабинет налогоплательщика"],["desk tax audit","камеральная налоговая проверка"],["penalty","штраф"],["late payment interest","пени"],["tax risk","налоговый риск"],["auditor","аудитор"],["risk mitigation strategy","стратегия снижения рисков"],["tax optimisation","налоговая оптимизация"],["tax evasion","уклонение от уплаты налогов"],["tax calendar","налоговый календарь"],
+["internal controls","система внутреннего контроля"],["counterparty due diligence","проверка контрагента (должная осмотрительность)"],["tax burden","налоговая нагрузка"],["corrective tax return","уточнённая налоговая декларация"],["request for explanations","требование о представлении пояснений"],["tax compliance","соблюдение налогового законодательства"]
+];
+
+const CASES = [
+{ id:1, title:"Crossing the VAT Threshold", tags:["USN","VAT 2026","Choice of rate"],
+  situation:"Volga Print LLC is a fictional printing company in Kazan on the simplified tax system. Its income in 2025 was 24 million roubles, so from 1 January 2026 it is no longer exempt from VAT. The company buys expensive paper and printing equipment with VAT, and its main clients are large companies that deduct input VAT. The chief accountant wants the reduced 5 percent rate without deductions. The company has no tax calendar, and its first VAT return is due soon.",
+  role:"Partner A is the finance director of Volga Print. Partner B is the external auditor.",
+  tasksB:["Identify the main tax risks created by the new VAT obligation.","Compare the 5 percent rate without deductions and the 22 percent rate with deductions for this company.","Recommend at least three measures, for example on documents, deadlines, and invoices.","Explain how your measures will reduce the tax risk and the tax burden.","Agree who does what and by when."],
+  tasksA:["Say why the company must pay VAT in 2026.","Name two risks of the new situation.","Choose one VAT rate and give two reasons.","Recommend three simple measures.","Agree on one deadline."],
+  facts:["The standard VAT rate is 22 percent since 1 January 2026.","A company on USN is exempt from VAT if its income for the previous year was not more than 20 million roubles.","Above this level it may choose 5 or 7 percent without deductions, or 22 percent with input VAT deductions.","A VAT return is filed every quarter by the 25th day of the next month, only electronically."],
+  starters:{problem:"The main tax risk for Volga Print is that…",reason1:"This risk exists because the company…",reason2:"Another reason is that…",rec1:"First, we recommend that the company chooses…",rec2:"Second, the company should set up…",rec3:"Third, the accountant should…",result:"As a result, the company will…",sc:"We choose the … rate because our purchases… and our clients…"},
+  vocab:["simplified tax system (USN)","value added tax (VAT)","input VAT","tax regime","tax return","electronic document flow","tax calendar","tax risk","risk mitigation strategy","tax burden","tax rate"],
+  sc:"Agree on one VAT option and justify it with the company’s purchases and its clients.",
+  scField:"Which VAT option, and why for this company?" },
+{ id:2, title:"Paid on Time, Still in Trouble", tags:["Individual entrepreneur","ENS","3-NDFL"],
+  situation:"Anna Lebedeva is a fictional designer, registered as an individual entrepreneur on USN on income. She transfers her advance payments to the single tax account on time, but she has not sent two notifications of calculated tax, and the tax office has sent her a message. In 2025 she also sold a flat that she had owned for only two years. She thinks that a sale like this needs no tax return.",
+  role:"Partner A is Anna Lebedeva. Partner B is the auditor who acts as her tax adviser.",
+  tasksB:["Explain why paying on time is not enough when notifications are missing.","Identify the risk connected with the sale of the flat and the 3-NDFL return.","Recommend at least three measures that keep her tax position correct during the year.","Explain the possible consequences if she does nothing.","Agree on an action plan with dates."],
+  tasksA:["Say what Anna did correctly.","Say what she forgot to do.","Say which return she needs for the flat and by when.","Recommend three simple steps.","Agree on the first step for this week."],
+  facts:["Money on the single tax account is distributed between taxes by the FNS.","A notification of calculated tax tells the FNS how much is due before the return is filed.","An individual who sold property owned for less than the minimum period files form 3-NDFL by 30 April.","A property deduction can reduce the taxable income from the sale."],
+  starters:{problem:"The main problem is that Anna paid…, but she did not…",reason1:"This happened because she thought that…",reason2:"Another reason is that…",rec1:"First, we recommend that she sends…",rec2:"Second, she should file form 3-NDFL…",rec3:"Third, she can use a tax calendar to…",result:"As a result, she will avoid…",sc:"Paying a tax means…, while informing the FNS means…"},
+  vocab:["single tax account (ENS)","single tax payment","notification of calculated tax","advance payment","personal income tax","tax return","taxpayer’s personal account","tax deduction","penalty","tax calendar","tax compliance"],
+  sc:"Explain clearly the difference between paying a tax and informing the FNS about it.",
+  scField:"Paying a tax vs informing the FNS" },
+{ id:3, title:"A Supplier with No Staff", tags:["General regime","Input VAT","Desk audit"],
+  situation:"Nord Trade LLC is a fictional wholesale company on the general tax regime. Last quarter it deducted a large amount of input VAT from a new supplier. The supplier has no staff, no warehouse, and was registered three months ago. During the desk tax audit of the VAT return, the FNS has sent a request for explanations. The chief accountant says the invoice is correct, so the deduction is safe.",
+  role:"Partner A is the chief accountant of Nord Trade. Partner B is the external auditor.",
+  tasksB:["Explain why a correct invoice alone may not protect the deduction.","Identify the main tax risks and their possible financial consequences.","Decide whether the company should defend the deduction or file a corrective tax return, and justify the choice.","Recommend at least three measures of counterparty due diligence and internal control.","Agree on the reply to the FNS and a deadline."],
+  tasksA:["Say what the FNS asked for and why.","Name two warning signs about the supplier.","Say what could happen if the deduction is cancelled.","Recommend three ways to check suppliers.","Agree who will prepare the explanations."],
+  facts:["After a return is filed, the FNS carries out a desk tax audit.","During the audit the FNS may send a request for explanations.","If a deduction is cancelled, the company pays the additional tax, late payment interest, and possibly a penalty.","A corrective tax return can fix an error in a return that was already filed."],
+  starters:{problem:"The main tax risk is that the FNS may cancel…",reason1:"The first warning sign is that the supplier…",reason2:"The second warning sign is that…",rec1:"First, we recommend checking every new counterparty…",rec2:"Second, the company should keep primary documents that prove…",rec3:"Third, we suggest internal controls such as…",result:"As a result, the company will be able to…",sc:"We recommend… because the evidence shows that…"},
+  vocab:["general tax regime","input VAT","desk tax audit","request for explanations","counterparty due diligence","primary documents","tax risk","late payment interest","penalty","corrective tax return","internal controls"],
+  sc:"Decide whether to keep the deduction or file a corrective tax return, and support the decision with evidence.",
+  scField:"Keep the deduction or file a corrective return?" },
+{ id:4, title:"Bookkeeping Is Not Tax Accounting", tags:["Tax accounting","Deadlines","Internal controls"],
+  situation:"Ural Components LLC is a fictional manufacturer on the general tax regime. One accountant does all the bookkeeping and believes that the profit in the financial statements is the same as the tax base. The company keeps no tax registers, and primary documents often arrive weeks late. Last quarter its VAT return was filed ten days after the deadline, and the company received a penalty. The owner wants to understand what went wrong.",
+  role:"Partner A is the owner of Ural Components. Partner B is the external auditor.",
+  tasksB:["Explain the difference between bookkeeping and tax accounting for this company.","Identify the causes of the late VAT return and the risks of the current system.","Recommend at least three measures, including tax registers, a tax calendar, and document flow.","Explain how each measure prevents a specific mistake.","Agree on responsibilities and a timeline."],
+  tasksA:["Say what the accountant does and what is missing.","Say why the VAT return was late.","Name two risks for the company.","Recommend three measures.","Agree who is responsible for deadlines."],
+  facts:["Tax accounting collects the data needed to calculate the tax base, which may differ from accounting profit.","Data from primary documents is summarised in tax registers.","A late return can lead to a penalty of 5 percent of the unpaid tax for each month of delay.","Electronic document flow helps documents arrive faster."],
+  starters:{problem:"The main problem is that the company has no…",reason1:"One reason is that the accountant thinks that…",reason2:"Another reason is that primary documents…",rec1:"First, we recommend introducing tax registers for…",rec2:"Second, a tax calendar will…",rec3:"Third, electronic document flow with suppliers will…",result:"As a result, the company will file…",sc:"This measure prevents… because…"},
+  vocab:["tax accounting","tax register","primary documents","tax base","tax return","penalty","internal controls","tax compliance","electronic document flow","tax calendar","tax risk"],
+  sc:"For each measure, show which specific mistake it prevents.",
+  scField:"Measure → the mistake it prevents" },
+{ id:5, title:"Optimisation or Evasion?", tags:["Tax planning","Legal limits","Ethics"],
+  situation:"Sever Logistics LLC is a fictional transport company on USN. Its income is growing fast and will soon exceed the VAT exemption level. The owner suggests opening three new small companies with the same staff, office, and clients, so that each of them stays below the threshold and pays no VAT. He calls this tax optimisation and asks the auditor to approve the plan.",
+  role:"Partner A is the owner of Sever Logistics. Partner B is the external auditor.",
+  tasksB:["Explain the difference between legal tax optimisation and tax evasion.","Identify the tax risks of the owner’s plan and the signs that tax authorities may notice.","Offer at least three legal alternatives to reduce the tax burden or the risk.","Explain the possible consequences of the plan for the company and the owner.","Reach an agreement on the next step."],
+  tasksA:["Describe the owner’s plan in your own words.","Say why the plan looks risky.","Give one example of legal tax optimisation.","Recommend three legal measures.","Agree on what the owner will do next."],
+  facts:["Tax optimisation is legal only when it uses options that the law provides.","Tax evasion is illegal and can be a criminal offence.","Several companies with the same staff, office, and clients look like one business to the tax authorities.","A company on USN above the exemption level may choose a reduced VAT rate."],
+  starters:{problem:"The main tax risk of the plan is that…",reason1:"The tax authorities may notice that the new companies…",reason2:"Another reason is that the only purpose of the plan is…",rec1:"First, instead of the plan we recommend…",rec2:"Second, the company can legally…",rec3:"Third, we suggest regular tax compliance checks…",result:"As a result, the company will grow without…",sc:"Legal optimisation means…, for example…, while evasion means…, for example…"},
+  vocab:["tax optimisation","tax evasion","tax burden","simplified tax system (USN)","tax risk","tax compliance","desk tax audit","penalty","risk mitigation strategy","auditor","value added tax (VAT)"],
+  sc:"Draw a clear line between legal optimisation and evasion, with one example of each.",
+  scField:"One example of optimisation, one of evasion" }
+];
+
+const FIELDS = [
+  {k:"problem", label:"Main problem", hint:"The main tax risk, in one clear sentence."},
+  {k:"reason1", label:"Reason 1", group:"r"},
+  {k:"reason2", label:"Reason 2", group:"r"},
+  {k:"rec1", label:"Recommendation 1", rec:true},
+  {k:"rec2", label:"Recommendation 2", rec:true},
+  {k:"rec3", label:"Recommendation 3", rec:true},
+  {k:"result", label:"Expected result", hint:"How will the measures reduce the tax risk?"},
+  {k:"sc", label:"Success condition", sc:true}
+];
+
+const PHRASES = [
+ ["Opening the meeting",["Thank you for meeting us today. We would like to discuss ","The purpose of this meeting is to review ","Let me briefly describe our situation. "]],
+ ["Describing the situation (client)",["At the moment our company applies ","Last quarter we ","Our main concern is that "]],
+ ["Identifying risks (auditor)",["The main tax risk I see is that ","If the FNS finds this during a desk tax audit, ","This could lead to additional tax, late payment interest, and "]],
+ ["Asking for clarification",["Could you explain why ","What evidence do you have that ","How often do you check "]],
+ ["Recommending",["I would recommend that the company ","The first priority should be ","It would be advisable to "]],
+ ["Negotiating and agreeing",["I see your point, but ","That is a fair concern. However, ","Could we agree to ","Who will be responsible for "]],
+ ["Concluding with an action plan",["To sum up, we agree to ","The next step is ","By the end of the month, "]]
+];
+
+const CRITERIA = [
+ ["vocab","Vocabulary range","At least 8 glossary items are used accurately and appropriately."],
+ ["analysis","Risk analysis","The main tax risk and its causes are clearly identified."],
+ ["solution","Recommendations","At least 3 practical measures are given and explained."],
+ ["accuracy","Accuracy of facts","Rates, thresholds, and deadlines match the text of the lesson."],
+ ["team","Role play and interaction","Both roles contribute, ask questions, respond, and reach an agreement."]
+];
+const BANDS = ["Evidence is absent","Criterion is minimally demonstrated","Significant gaps","Acceptable, but some elements need development","Good performance; minor weaknesses","Fully and convincingly demonstrated"];
+
+const ILLO = {
+1:`<svg viewBox="0 0 320 170" role="img" aria-label="Income bars rising above a threshold line"><rect width="320" height="170" fill="var(--il-bg)"/><circle cx="262" cy="56" r="40" fill="var(--il-orb)"/><rect x="18" y="128" width="284" height="10" fill="var(--il-ground)"/><g stroke="var(--il-navy)" stroke-width="2"><rect x="46" y="96" width="30" height="32" fill="var(--il-blue)"/><rect x="92" y="82" width="30" height="46" fill="var(--il-blue)"/><rect x="138" y="64" width="30" height="64" fill="var(--il-teal)"/><rect x="184" y="40" width="30" height="88" fill="var(--il-gold)"/></g><path d="M30 72 H236" stroke="var(--il-navy)" stroke-width="2.5" stroke-dasharray="7 6"/><rect x="232" y="60" width="62" height="24" rx="5" fill="var(--il-white)" stroke="var(--il-navy)" stroke-width="2"/><text x="263" y="77" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="12" font-weight="600" fill="var(--il-navy)">20 mln</text></svg>`,
+2:`<svg viewBox="0 0 320 170" role="img" aria-label="Calendar page with a coin and an envelope"><rect width="320" height="170" fill="var(--il-bg)"/><circle cx="256" cy="64" r="44" fill="var(--il-orb)"/><rect x="18" y="128" width="284" height="10" fill="var(--il-ground)"/><rect x="40" y="34" width="108" height="94" rx="6" fill="var(--il-white)" stroke="var(--il-navy)" stroke-width="2.5"/><rect x="40" y="34" width="108" height="22" rx="6" fill="var(--il-navy)"/><g fill="var(--il-orb)" stroke="var(--il-blue)" stroke-width="1.5"><rect x="52" y="66" width="16" height="14"/><rect x="74" y="66" width="16" height="14"/><rect x="96" y="66" width="16" height="14"/><rect x="118" y="66" width="16" height="14"/><rect x="52" y="88" width="16" height="14"/><rect x="74" y="88" width="16" height="14"/><rect x="96" y="88" width="16" height="14"/></g><rect x="118" y="88" width="16" height="14" fill="var(--il-gold)" stroke="var(--il-navy)" stroke-width="1.5"/><circle cx="190" cy="104" r="18" fill="var(--il-gold)" stroke="var(--il-navy)" stroke-width="2.5"/><path d="M226 66 h62 v40 h-62Z" fill="var(--il-white)" stroke="var(--il-navy)" stroke-width="2.5"/><path d="M226 66 l31 22 l31 -22" fill="none" stroke="var(--il-teal)" stroke-width="2.5"/></svg>`,
+3:`<svg viewBox="0 0 320 170" role="img" aria-label="Empty warehouse and a magnifying glass"><rect width="320" height="170" fill="var(--il-bg)"/><circle cx="252" cy="62" r="44" fill="var(--il-orb)"/><rect x="18" y="128" width="284" height="10" fill="var(--il-ground)"/><path d="M36 72 L106 40 L176 72 V128 H36Z" fill="var(--il-white)" stroke="var(--il-navy)" stroke-width="2.5"/><rect x="82" y="84" width="48" height="44" fill="var(--il-orb)" stroke="var(--il-navy)" stroke-width="2"/><path d="M82 95 H130 M82 106 H130 M82 117 H130" stroke="var(--il-blue)" stroke-width="1.5"/><circle cx="234" cy="80" r="26" fill="none" stroke="var(--il-navy)" stroke-width="5"/><circle cx="234" cy="80" r="20" fill="var(--il-teal)" opacity=".35"/><path d="M253 99 L280 126" stroke="var(--il-gold)" stroke-width="9" stroke-linecap="round"/></svg>`,
+4:`<svg viewBox="0 0 320 170" role="img" aria-label="Accounting ledger beside a tax register"><rect width="320" height="170" fill="var(--il-bg)"/><circle cx="262" cy="58" r="42" fill="var(--il-orb)"/><rect x="18" y="128" width="284" height="10" fill="var(--il-ground)"/><rect x="40" y="36" width="96" height="92" rx="5" fill="var(--il-navy)"/><rect x="48" y="44" width="80" height="76" fill="var(--il-white)"/><g stroke="var(--il-blue)" stroke-width="1.5"><path d="M56 56 H120 M56 68 H120 M56 80 H120 M56 92 H120 M56 104 H120"/><path d="M96 50 V114"/></g><rect x="168" y="46" width="96" height="82" rx="5" fill="var(--il-white)" stroke="var(--il-navy)" stroke-width="2.5"/><g fill="var(--il-teal)"><rect x="180" y="60" width="36" height="8" rx="2"/><rect x="180" y="76" width="56" height="8" rx="2"/><rect x="180" y="92" width="44" height="8" rx="2"/></g><rect x="180" y="108" width="72" height="8" rx="2" fill="var(--il-gold)"/><path d="M142 82 h18 m-6 -6 l6 6 l-6 6" fill="none" stroke="var(--il-navy)" stroke-width="2.5"/></svg>`,
+5:`<svg viewBox="0 0 320 170" role="img" aria-label="Balance scale with a document and a coin"><rect width="320" height="170" fill="var(--il-bg)"/><circle cx="266" cy="62" r="44" fill="var(--il-orb)"/><rect x="18" y="128" width="284" height="10" fill="var(--il-ground)"/><path d="M160 22 L174 36 H146Z" fill="var(--il-gold)"/><rect x="157" y="36" width="6" height="84" fill="var(--il-navy)"/><rect x="138" y="118" width="44" height="10" fill="var(--il-navy)"/><rect x="88" y="46" width="144" height="4" fill="var(--il-blue)"/><g stroke="var(--il-navy)" stroke-width="2.5" fill="none"><path d="M92 50 L74 84M92 50 L110 84M228 50 L210 84M228 50 L246 84"/></g><g stroke="var(--il-teal)" stroke-width="3.5" fill="none"><path d="M70 86 a22 10 0 0 0 44 0M206 86 a22 10 0 0 0 44 0"/></g><rect x="80" y="62" width="24" height="22" fill="var(--il-white)" stroke="var(--il-navy)" stroke-width="2"/><path d="M85 69 H99 M85 75 H96" stroke="var(--il-blue)" stroke-width="1.5"/><circle cx="228" cy="76" r="10" fill="var(--il-gold)" stroke="var(--il-navy)" stroke-width="2"/></svg>`
+};
+
+/* ---------- State ---------- */
+const KEY = "tax-risk-case-challenge-v1";
+let S = {pair:{a:"",b:"",g:"",mine:null}, retell:{}, cases:{}, rubric:{scores:{}}, teacher:{}, theme:null};
+try{ const raw = localStorage.getItem(KEY); if(raw){ const p = JSON.parse(raw); S = Object.assign(S,p); } }catch(e){}
+CASES.forEach(c=>{ if(!S.cases[c.id]) S.cases[c.id]={f:{},spk:{},tasks:[]}; if(!S.cases[c.id].lvl) S.cases[c.id].lvl="A"; });
+let saveT=null;
+function save(){ clearTimeout(saveT); saveT=setTimeout(()=>{ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} },250); }
+
+const $ = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>Array.from(r.querySelectorAll(s));
+const esc = s=>String(s).replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+
+/* ---------- Vocabulary matching ---------- */
+const SPECIAL = {
+ "Tax Code":"tax[\\s-]+code",
+ "federal, regional, and local taxes":"federal,?[\\s-]+regional,?[\\s-]+(?:and[\\s-]+)?local[\\s-]+tax(?:es)?",
+ "Federal Tax Service (FNS)":"federal[\\s-]+tax[\\s-]+service|FNS",
+ "simplified tax system (USN)":"simplified[\\s-]+tax[\\s-]+system|USN",
+ "value added tax (VAT)":"value[\\s-]+added[\\s-]+tax|VAT",
+ "single tax account (ENS)":"single[\\s-]+tax[\\s-]+accounts?|ENS",
+ "taxpayer’s personal account":"taxpayer[’']?s?[\\s-]+personal[\\s-]+accounts?|personal[\\s-]+account",
+ "notification of calculated tax":"notifications?[\\s-]+of[\\s-]+(?:the[\\s-]+)?calculated[\\s-]+tax(?:es)?",
+ "primary documents":"primary[\\s-]+documents?",
+ "internal controls":"internal[\\s-]+controls?",
+ "tax optimisation":"tax[\\s-]+optimi[sz]ation",
+ "request for explanations":"requests?[\\s-]+for[\\s-]+explanations?",
+ "counterparty due diligence":"(?:counterparty[\\s-]+)?due[\\s-]+diligence"
+};
+function buildPattern(term){
+  if(SPECIAL[term]) return SPECIAL[term];
+  let w = term, verb=false;
+  if(w.startsWith("to ")){ verb=true; w=w.slice(3); }
+  let p;
+  if(verb){
+    p = w.endsWith("e") ? w.slice(0,-1)+"(?:e|es|ed|ing)" : w+"(?:s|es|ed|ing)?";
+  } else {
+    p = /[^aeiou]y$/.test(w) ? w.slice(0,-1)+"(?:y|ies)" : w+"(?:s|es)?";
+  }
+  p = p.replace(/ /g,"[\\s-]+").replace(/iz(?=\(\?:e)/,"i[sz]");
+  return p;
+}
+const VOC = GLOSSARY.map(([en,ru],i)=>({en,ru,i, re:new RegExp("\\b(?:"+buildPattern(en)+")\\b","gi")}))
+  .sort((a,b)=>b.en.length-a.en.length);
+function matchVocab(text){
+  const used=new Set(), spans=[];
+  if(!text) return used;
+  const all=[];
+  VOC.forEach(v=>{
+    v.re.lastIndex=0; let m;
+    while((m=v.re.exec(text))){
+      if(m[0].length===0){ v.re.lastIndex++; continue; }
+      all.push([m.index, m.index+m[0].length, v.en]);
+    }
+  });
+  all.sort((x,y)=>(y[1]-y[0])-(x[1]-x[0]) || x[0]-y[0]);
+  all.forEach(([s,e,en])=>{ if(!spans.some(([a,b])=>s<b&&e>a)){ spans.push([s,e]); used.add(en); } });
+  return used;
+}
+function caseText(id){ const f=S.cases[id].f; return FIELDS.map(x=>f[x.k]||"").join("\n"); }
+
+/* ---------- Tabs & routing ---------- */
+const VIEWS = [{t:"brief",l:"Brief"}].concat(CASES.map(c=>({t:"case"+c.id,l:"Case "+c.id,c:c.id}))).concat([{t:"rubric",l:"Peer rubric"},{t:"glossary",l:"Glossary"}]);
+const tabsEl=$("#tabs");
+tabsEl.innerHTML = VIEWS.map(v=>`<button class="tab" role="tab" id="tab-${v.t}" data-t="${v.t}" aria-selected="false">${v.c?`<span class="pip" id="pip-${v.c}"></span>`:""}${v.l}${v.c?` <span class="lv" id="lv-${v.c}">A</span><span class="mine" id="mine-${v.c}" hidden>Ours</span>`:""}</button>`).join("");
+function show(t){
+  if(!VIEWS.some(v=>v.t===t)) t="brief";
+  VIEWS.forEach(v=>{ const el=$("#v-"+v.t); if(el) el.hidden = v.t!==t; $("#tab-"+v.t).setAttribute("aria-selected", v.t===t?"true":"false"); });
+  if(t==="glossary") renderGlossary();
+  try{ history.replaceState(null,"","#"+t); }catch(e){}
+  S.view=t; save();
+  const tb=$("#tab-"+t); if(tb && tb.scrollIntoView) tb.scrollIntoView({block:"nearest",inline:"nearest"});
+}
+tabsEl.addEventListener("click",e=>{ const b=e.target.closest(".tab"); if(b){ show(b.dataset.t); window.scrollTo({top:0}); } });
+
+/* ---------- Brief ---------- */
+$("#casesIndex").innerHTML = CASES.map(c=>`<button class="ci" data-go="case${c.id}"><span class="k">Case ${c.id}</span><span class="h">${esc(c.title)}</span><span class="m">${c.tags.join(" · ")}</span></button>`).join("");
+$("#casesIndex").addEventListener("click",e=>{ const b=e.target.closest("[data-go]"); if(b){ show(b.dataset.go); window.scrollTo({top:0}); } });
+$("#casePick").innerHTML = CASES.map(c=>`<button data-c="${c.id}" aria-pressed="false" title="${esc(c.title)}">${c.id}</button>`).join("");
+$("#casePick").addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return; const c=+b.dataset.c; S.pair.mine = S.pair.mine===c?null:c; save(); renderMine(); });
+function renderMine(){
+  $$("#casePick button").forEach(b=>b.setAttribute("aria-pressed", +b.dataset.c===S.pair.mine?"true":"false"));
+  CASES.forEach(c=>{ $("#mine-"+c.id).hidden = S.pair.mine!==c.id; });
+  $("#goMine").hidden = !S.pair.mine;
+}
+$("#goMine").addEventListener("click",()=>{ show("case"+S.pair.mine); window.scrollTo({top:0}); });
+[["pA","a"],["pB","b"],["pG","g"]].forEach(([id,k])=>{ const el=$("#"+id); el.value=S.pair[k]||""; el.addEventListener("input",()=>{ S.pair[k]=el.value; save(); renderPairLines(); }); });
+[["rRU","ru"],["rUS","us"],["rCN","cn"]].forEach(([id,k])=>{ const el=$("#"+id); el.value=S.retell[k]||""; el.addEventListener("input",()=>{ S.retell[k]=el.value; save(); }); });
+
+/* ---------- Case views ---------- */
+let lastField=null;
+function fieldHTML(c,f){
+  const id=`c${c.id}-${f.k}`;
+  const label = f.sc ? "Success condition" : f.label;
+  const hint = f.sc ? c.scField : (f.hint||"");
+  return `<div class="field${f.rec?" rec":""}">
+    <div class="fhead"><label for="${id}">${esc(label)}${hint?`<span class="hint">${esc(hint)}</span>`:""}</label>
+      <span class="spk" role="group" aria-label="Who presents this part"><button class="a" data-spk="A" data-case="${c.id}" data-k="${f.k}" aria-pressed="false" title="Partner A presents">A</button><button class="b" data-spk="B" data-case="${c.id}" data-k="${f.k}" aria-pressed="false" title="Partner B presents">B</button></span>
+      <span class="wc" id="wc-${id}">0 words</span></div>
+    <textarea id="${id}" data-case="${c.id}" data-k="${f.k}" rows="${f.rec?3:2}"></textarea>
+  </div>`;
+}
+function caseHTML(c){
+  const fr = FIELDS.filter(f=>f.group==="r"), others = FIELDS.filter(f=>!f.group);
+  const recs = others.filter(f=>f.rec);
+  return `<section class="view" id="v-case${c.id}" aria-label="Case ${c.id}" hidden>
+  <div class="case-head">
+    <div><div class="k">Case ${c.id} of 5</div><h2>${esc(c.title)}</h2><div class="tags">${c.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div><div class="lvl" role="group" aria-label="Level"><button data-lvl="A" data-case="${c.id}" aria-pressed="false">Level A · with support</button><button data-lvl="B" data-case="${c.id}" aria-pressed="false">Level B · standard</button></div></div>
+    <div class="illo">${ILLO[c.id]}</div>
+  </div>
+  <div class="case-grid">
+    <div class="brief-col">
+      <div class="panel">
+        <h3 class="sh">Situation</h3>
+        <p class="situ">${esc(c.situation)}</p>
+        <div class="role"><b>Your role</b><span>${esc(c.role)}</span></div>
+        <h3 class="sh">Your task</h3>
+        <ul class="tasks" id="tasks-${c.id}"></ul>
+        <div class="facts" id="facts-${c.id}"><b>Key facts from the text</b><ul>${c.facts.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+        <div class="sc"><b>Success condition</b>${esc(c.sc)}</div>
+        <h3 class="sh">Target vocabulary</h3>
+        <div class="tv" id="tv-${c.id}">${c.vocab.map(v=>`<button data-ins="${esc(v.replace(/^to /,""))}" data-v="${esc(v)}" title="Insert into the active note">${esc(v)}</button>`).join("")}</div>
+        <p class="small" style="margin:8px 0 0">Tap a word to insert it into the note you are writing. Gold items already appear in your notes.</p>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="panel">
+        <h3 class="sh">Progress</h3>
+        <div class="meter">
+          <div class="ring"><svg viewBox="0 0 88 88" aria-hidden="true"><circle cx="44" cy="44" r="38" fill="none" stroke="var(--line)" stroke-width="7"/><circle id="ring-${c.id}" cx="44" cy="44" r="38" fill="none" stroke="var(--gold)" stroke-width="7" stroke-linecap="round" stroke-dasharray="238.76" stroke-dashoffset="238.76" style="transition:stroke-dashoffset .3s"/></svg><div class="num"><div><span id="vn-${c.id}">0</span><small>of 8 terms</small></div></div></div>
+          <ul class="checks" id="chk-${c.id}"></ul>
+        </div>
+        <div class="used-list" id="ul-${c.id}"></div>
+      </div>
+      <div class="panel">
+        <h3 class="sh">Preparation notes</h3>
+        <div class="pair-line" id="pl-${c.id}"></div>
+        <div class="fields">
+          ${fieldHTML(c,others[0])}
+          <div class="fgroup two">${fr.map(f=>fieldHTML(c,f)).join("")}</div>
+          <div class="fgroup">${recs.map(f=>fieldHTML(c,f)).join("")}</div>
+          ${fieldHTML(c,others.find(f=>f.k==="result"))}
+          ${fieldHTML(c,others.find(f=>f.sc))}
+        </div>
+        <div class="actions" style="margin-top:16px">
+          <button class="btn primary" data-copy="${c.id}">Copy presentation plan</button>
+          <button class="btn danger" data-clear="${c.id}">Clear notes</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h3 class="sh">Language toolkit</h3>
+        <div class="kit-tabs" role="tablist"><button role="tab" aria-selected="true" data-kit="ph" data-case="${c.id}">Useful phrases</button><button role="tab" aria-selected="false" data-kit="gl" data-case="${c.id}">Glossary</button></div>
+        <div class="kit-body" id="kit-ph-${c.id}">${PHRASES.map(([h,list])=>`<div class="ph-group"><h4>${esc(h)}</h4>${list.map(p=>`<button class="ph" data-ins="${esc(p)}">${esc(p.trim())}…</button>`).join("")}</div>`).join("")}</div>
+        <div class="kit-body" id="kit-gl-${c.id}" hidden><input type="text" class="kit-search" data-case="${c.id}" placeholder="Search the glossary" aria-label="Search the glossary" autocomplete="off"><div class="g-mini" id="gm-${c.id}"></div></div>
+        <p class="small" style="margin:10px 0 0">Click inside a note first, then tap a phrase or term to insert it.</p>
+      </div>
+    </div>
+  </div>
+  </section>`;
+}
+$("#caseViews").innerHTML = CASES.map(caseHTML).join("");
+
+function gMini(id,q){
+  q=(q||"").toLowerCase().trim();
+  const list = GLOSSARY.filter(([en,ru])=>!q||en.toLowerCase().includes(q)||ru.toLowerCase().includes(q));
+  $("#gm-"+id).innerHTML = list.map(([en,ru])=>`<button data-ins="${esc(en.replace(/^to /,"").replace(/ \(USE\)$/,""))}">${esc(en)}<small>${esc(ru)}</small></button>`).join("") || `<span class="small">No match.</span>`;
+}
+function tasksOf(c){ return S.cases[c.id].lvl==="B" ? c.tasksB : c.tasksA; }
+function renderLevel(id){
+  const c=CASES.find(x=>x.id===id), st=S.cases[id], lv=st.lvl;
+  $$(`[data-lvl][data-case="${id}"]`).forEach(b=>b.setAttribute("aria-pressed", b.dataset.lvl===lv?"true":"false"));
+  const tk=st.tasksBy=st.tasksBy||{}; tk[lv]=tk[lv]||[];
+  $("#tasks-"+id).innerHTML = tasksOf(c).map((t,i)=>`<li><label><input type="checkbox" id="t${id}-${i}" data-case="${id}" data-task="${i}"${tk[lv][i]?" checked":""}><span>${i+1}. ${esc(t)}</span></label></li>`).join("");
+  $("#facts-"+id).hidden = lv!=="A";
+  FIELDS.forEach(f=>{ $(`#c${id}-${f.k}`).placeholder = lv==="A" ? (c.starters[f.k]||"") : ""; });
+  const lt=$("#lv-"+id); if(lt) lt.textContent=lv;
+}
+CASES.forEach(c=>{
+  gMini(c.id,"");
+  const st=S.cases[c.id];
+  FIELDS.forEach(f=>{ const ta=$(`#c${c.id}-${f.k}`); ta.value=st.f[f.k]||""; });
+  renderLevel(c.id);
+  updateCase(c.id);
+});
+
+function words(s){ return (s.trim().match(/\S+/g)||[]).length; }
+function updateCase(id){
+  const c=CASES.find(x=>x.id===id), st=S.cases[id];
+  FIELDS.forEach(f=>{ const n=words(st.f[f.k]||""); $(`#wc-c${id}-${f.k}`).textContent = n+(n===1?" word":" words");
+    $$(`.spk button[data-case="${id}"][data-k="${f.k}"]`).forEach(b=>b.setAttribute("aria-pressed", st.spk[f.k]===b.dataset.spk?"true":"false")); });
+  const used = matchVocab(caseText(id)); const n=used.size;
+  $("#vn-"+id).textContent=n;
+  $("#ring-"+id).setAttribute("stroke-dashoffset", (238.76*(1-Math.min(n,8)/8)).toFixed(2));
+  $("#ring-"+id).setAttribute("stroke", n>=8?"var(--ok)":"var(--gold)");
+  $("#ul-"+id).innerHTML = n? Array.from(used).sort().map(u=>`<span>${esc(u)}</span>`).join("") : `<span class="small" style="border:0;background:none;padding:0">Glossary items you use in your notes will appear here.</span>`;
+  $$("#tv-"+id+" button").forEach(b=>b.classList.toggle("used", used.has(b.dataset.v)));
+  const f=st.f, has=k=>words(f[k]||"")>=2;
+  const spkVals = Object.values(st.spk||{});
+  const checks=[
+    ["Main problem", has("problem")],
+    ["Two reasons", has("reason1")&&has("reason2")],
+    ["Three recommendations", has("rec1")&&has("rec2")&&has("rec3")],
+    ["Expected result", has("result")],
+    ["8+ glossary items", n>=8],
+    ["Success condition", has("sc")],
+    ["Both partners speak", spkVals.includes("A")&&spkVals.includes("B")],
+    ["All tasks covered", tasksOf(c).every((_,i)=>((st.tasksBy||{})[st.lvl]||[])[i])]
+  ];
+  $("#chk-"+id).innerHTML = checks.map(([l,ok])=>`<li class="${ok?"ok":""}"><i></i>${l}</li>`).join("");
+  const done = checks.filter(x=>x[1]).length, pip=$("#pip-"+id);
+  pip.className = "pip"+(done===checks.length?" done":done>0?" part":"");
+  if($("#v-glossary") && !$("#v-glossary").hidden) renderGlossary();
+}
+function renderPairLines(){
+  const a=S.pair.a||"Partner A", b=S.pair.b||"Partner B";
+  CASES.forEach(c=>{ $("#pl-"+c.id).innerHTML = `<span class="who"><span class="badge A">A</span>${esc(a)}</span><span class="who"><span class="badge B">B</span>${esc(b)}</span><span>Mark who presents each part.</span>`; });
+}
+renderPairLines();
+
+$("#caseViews").addEventListener("input",e=>{
+  const t=e.target;
+  if(t.tagName==="TEXTAREA" && t.dataset.case){ const id=+t.dataset.case; S.cases[id].f[t.dataset.k]=t.value; save(); updateCase(id); }
+  if(t.classList.contains("kit-search")) gMini(+t.dataset.case,t.value);
+});
+$("#caseViews").addEventListener("change",e=>{
+  const t=e.target;
+  if(t.type==="checkbox" && t.dataset.task!=null){ const id=+t.dataset.case, st=S.cases[id]; st.tasksBy=st.tasksBy||{}; (st.tasksBy[st.lvl]=st.tasksBy[st.lvl]||[])[+t.dataset.task]=t.checked; save(); updateCase(id); }
+});
+$("#caseViews").addEventListener("focusin",e=>{ if(e.target.tagName==="TEXTAREA") lastField=e.target; });
+$("#caseViews").addEventListener("mousedown",e=>{ if(e.target.closest("[data-ins]")) e.preventDefault(); });
+$("#caseViews").addEventListener("click",e=>{
+  const ins=e.target.closest("[data-ins]");
+  if(ins){ insertText(ins.dataset.ins, ins.closest(".view")); return; }
+  const lb=e.target.closest("[data-lvl]");
+  if(lb){ const id=+lb.dataset.case; S.cases[id].lvl=lb.dataset.lvl; save(); renderLevel(id); updateCase(id); return; }
+  const sp=e.target.closest("[data-spk]");
+  if(sp){ const id=+sp.dataset.case, k=sp.dataset.k, st=S.cases[id]; st.spk[k] = st.spk[k]===sp.dataset.spk?undefined:sp.dataset.spk; if(!st.spk[k]) delete st.spk[k]; save(); updateCase(id); return; }
+  const kt=e.target.closest("[data-kit]");
+  if(kt){ const id=kt.dataset.case; $$(`[data-kit][data-case="${id}"]`).forEach(b=>b.setAttribute("aria-selected", b===kt?"true":"false")); $("#kit-ph-"+id).hidden = kt.dataset.kit!=="ph"; $("#kit-gl-"+id).hidden = kt.dataset.kit!=="gl"; return; }
+  const cp=e.target.closest("[data-copy]");
+  if(cp){ copyText(planText(+cp.dataset.copy), "Presentation plan copied"); return; }
+  const cl=e.target.closest("[data-clear]");
+  if(cl){ armConfirm(cl, ()=>{ const id=+cl.dataset.clear; const lv=S.cases[id].lvl; S.cases[id]={f:{},spk:{},tasks:[],lvl:lv}; FIELDS.forEach(f=>$(`#c${id}-${f.k}`).value=""); save(); renderLevel(id); updateCase(id); toast("Notes cleared"); }); }
+});
+function insertText(txt, view){
+  let ta = lastField;
+  if(!ta || !view.contains(ta)) ta = view.querySelector("textarea");
+  if(!ta) return;
+  const s=ta.selectionStart??ta.value.length, e=ta.selectionEnd??ta.value.length;
+  const before=ta.value.slice(0,s), needSpace = before && !/\s$/.test(before) && !/^[,.\s]/.test(txt);
+  const add=(needSpace?" ":"")+txt;
+  ta.value = before+add+ta.value.slice(e);
+  const pos=s+add.length; ta.focus(); try{ ta.setSelectionRange(pos,pos); }catch(_){}
+  ta.dispatchEvent(new Event("input",{bubbles:true}));
+}
+function planText(id){
+  const c=CASES.find(x=>x.id===id), st=S.cases[id], f=st.f;
+  const who=k=>st.spk[k]? ` [${st.spk[k]==="A"?(S.pair.a||"Partner A"):(S.pair.b||"Partner B")}]` : "";
+  const used=Array.from(matchVocab(caseText(id))).sort();
+  const lines=[
+    `TAX RISK · CASE CHALLENGE`,
+    `CASE ${c.id}. ${c.title} · Level ${st.lvl}`,
+    `Roles: ${c.role}`,
+    `Pair: ${S.pair.a||"Partner A"} & ${S.pair.b||"Partner B"}${S.pair.g?` · Group ${S.pair.g}`:""}`,
+    ``,
+    `Main problem${who("problem")}: ${f.problem||""}`,
+    `Reason 1${who("reason1")}: ${f.reason1||""}`,
+    `Reason 2${who("reason2")}: ${f.reason2||""}`,
+    `Recommendation 1${who("rec1")}: ${f.rec1||""}`,
+    `Recommendation 2${who("rec2")}: ${f.rec2||""}`,
+    `Recommendation 3${who("rec3")}: ${f.rec3||""}`,
+    `Expected result${who("result")}: ${f.result||""}`,
+    `Success condition (${c.scField})${who("sc")}: ${f.sc||""}`,
+    ``,
+    `Glossary items used (${used.length}): ${used.join(", ")}`
+  ];
+  return lines.join("\n");
+}
+
+/* ---------- Rubric ---------- */
+$("#rbCase").innerHTML += CASES.map(c=>`<option value="${c.id}">Case ${c.id}. ${esc(c.title)}</option>`).join("");
+$("#crits").innerHTML = CRITERIA.map(([k,h,p])=>`<div class="crit"><div><h3>${h}</h3><p>${p}</p></div><div class="seg" role="group" aria-label="${h} score">${[0,1,2,3,4,5].map(n=>`<button data-crit="${k}" data-n="${n}" aria-pressed="false">${n}</button>`).join("")}</div><div class="band" id="band-${k}"></div></div>`).join("");
+const R=S.rubric;
+[["rbPair","pair"],["rbCase","case"],["rbAssessor","assessor"],["rbStrength","strength"],["rbSuggest","suggest"]].forEach(([id,k])=>{ const el=$("#"+id); el.value=R[k]||""; el.addEventListener("input",()=>{ R[k]=el.value; save(); }); });
+[["tfMark","mark"],["tfStrength","strength"],["tfNext","next"]].forEach(([id,k])=>{ const el=$("#"+id); el.value=S.teacher[k]||""; el.addEventListener("input",()=>{ S.teacher[k]=el.value; save(); }); });
+$("#crits").addEventListener("click",e=>{ const b=e.target.closest("[data-crit]"); if(!b) return; const k=b.dataset.crit,n=+b.dataset.n; R.scores[k] = R.scores[k]===n?undefined:n; if(R.scores[k]===undefined) delete R.scores[k]; save(); renderRubric(); });
+function renderRubric(){
+  let total=0;
+  CRITERIA.forEach(([k])=>{ const v=R.scores[k]; if(typeof v==="number") total+=v;
+    $$(`[data-crit="${k}"]`).forEach(b=>b.setAttribute("aria-pressed", +b.dataset.n===v?"true":"false"));
+    $("#band-"+k).textContent = typeof v==="number" ? BANDS[v] : ""; });
+  $("#rbTotal").textContent=total; $("#rbBar").style.width=(total/25*100)+"%";
+}
+renderRubric();
+
+/* Vocabulary heard tracker */
+if(!Array.isArray(R.heard)) R.heard=[];
+function renderVT(){
+  const c=CASES.find(x=>String(x.id)===String(R.case));
+  const target=c?c.vocab:[];
+  const heard=new Set(R.heard);
+  const extras=R.heard.filter(w=>!target.includes(w));
+  $("#vtCaseName").textContent = c ? `Case ${c.id}. ${c.title}` : "choose the case above";
+  $("#vtActive").innerHTML = target.map(w=>`<button data-heard="${esc(w)}" class="${heard.has(w)?"used":""}" aria-pressed="${heard.has(w)}">${esc(w)}</button>`).join("")
+    + extras.map(w=>`<button data-heard="${esc(w)}" class="used extra" aria-pressed="true" title="Added from the full glossary. Tap to remove">${esc(w)} <small>added</small></button>`).join("")
+    || `<span class="small">Choose the case to load its target vocabulary, or add words from the full glossary below.</span>`;
+  const q=($("#vtSearch").value||"").toLowerCase().trim();
+  const rest=GLOSSARY.filter(([en,ru])=>!target.includes(en)&&!heard.has(en)&&(!q||en.toLowerCase().includes(q)||ru.toLowerCase().includes(q)));
+  $("#vtAll").innerHTML = rest.map(([en,ru])=>`<button data-heard="${esc(en)}">${esc(en)}<small>${esc(ru)}</small></button>`).join("") || `<span class="small">No match.</span>`;
+  const n=R.heard.length;
+  $("#vtN").textContent=n;
+  $("#vtN").parentElement.classList.toggle("ok",n>=8);
+  $("#vtBar").style.width=Math.min(100,n/8*100)+"%";
+  $("#vtBar").parentElement.classList.toggle("ok",n>=8);
+}
+$("#v-rubric").addEventListener("click",e=>{
+  const b=e.target.closest("[data-heard]"); if(!b) return;
+  const w=b.dataset.heard, i=R.heard.indexOf(w);
+  if(i>=0) R.heard.splice(i,1); else R.heard.push(w);
+  save(); renderVT();
+});
+$("#rbCase").addEventListener("change",renderVT);
+$("#vtSearch").addEventListener("input",renderVT);
+renderVT();
+
+$("#rbCopy").addEventListener("click",()=>{
+  const c=CASES.find(x=>String(x.id)===String(R.case));
+  const lines=["PEER ASSESSMENT · TAX RISK CASE CHALLENGE",
+    `Presenting pair / case: ${R.pair||""}${c?` / Case ${c.id}. ${c.title}`:""}`,
+    `Peer assessor: ${R.assessor||""}`, "",
+    `Vocabulary heard (${R.heard.length}): ${R.heard.join(", ")}`, ""]
+    .concat(CRITERIA.map(([k,h])=>`${h}: ${typeof R.scores[k]==="number"?R.scores[k]:"_"} / 5`))
+    .concat([`TOTAL: ${$("#rbTotal").textContent} / 25`,"",`One strength: ${R.strength||""}`,`One suggestion: ${R.suggest||""}`]);
+  if(S.teacher.mark||S.teacher.strength||S.teacher.next) lines.push("",`Teacher's final mark: ${S.teacher.mark||""} / 25`,`Strength: ${S.teacher.strength||""}`,`Next step: ${S.teacher.next||""}`);
+  copyText(lines.join("\n"),"Assessment copied");
+});
+$("#rbClear").addEventListener("click",function(){ armConfirm(this,()=>{ Object.keys(R).forEach(k=>delete R[k]); R.scores={}; R.heard=[]; ["rbPair","rbCase","rbAssessor","rbStrength","rbSuggest","vtSearch"].forEach(id=>$("#"+id).value=""); save(); renderRubric(); renderVT(); toast("Rubric cleared"); }); });
+
+/* ---------- Glossary ---------- */
+function renderGlossary(){
+  const q=($("#glSearch").value||"").toLowerCase().trim();
+  const used=new Set(); CASES.forEach(c=>matchVocab(caseText(c.id)).forEach(u=>used.add(u)));
+  const rows=GLOSSARY.map(([en,ru],i)=>({en,ru,i})).filter(r=>!q||r.en.toLowerCase().includes(q)||r.ru.toLowerCase().includes(q));
+  $("#glBody").innerHTML = rows.map(r=>`<tr class="${used.has(r.en)?"hit":""}"><td class="n">${r.i+1}</td><td class="en">${esc(r.en)}</td><td class="ru">${esc(r.ru)}</td><td class="c"><button class="mini" data-cp="${esc(r.en)}">Copy</button></td></tr>`).join("") || `<tr><td colspan="4" class="small">No match.</td></tr>`;
+  $("#glCount").textContent = `${rows.length} of ${GLOSSARY.length} items · ${used.size} used in your notes`;
+}
+$("#glSearch").addEventListener("input",renderGlossary);
+$("#glBody").addEventListener("click",e=>{ const b=e.target.closest("[data-cp]"); if(b) copyText(b.dataset.cp,"Copied: "+b.dataset.cp); });
+
+/* ---------- Copy, toast, confirm ---------- */
+let toastT=null;
+function toast(m){ const t=$("#toast"); t.textContent=m; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,2200); }
+function fallback(text){ const m=$("#modal"), ta=$("#modalText"); ta.value=text; m.hidden=false; ta.focus(); ta.select(); }
+function copyText(text,msg){
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(()=>toast(msg),()=>fallback(text)); }
+    else fallback(text);
+  }catch(e){ fallback(text); }
+}
+$("#modalClose").addEventListener("click",()=>$("#modal").hidden=true);
+$("#modal").addEventListener("click",e=>{ if(e.target.id==="modal") $("#modal").hidden=true; });
+function armConfirm(btn,fn){
+  if(btn.dataset.armed){ delete btn.dataset.armed; btn.classList.remove("confirm"); btn.textContent=btn.dataset.orig; fn(); return; }
+  btn.dataset.orig=btn.textContent; btn.dataset.armed="1"; btn.classList.add("confirm"); btn.textContent="Tap again to confirm";
+  setTimeout(()=>{ if(btn.dataset.armed){ delete btn.dataset.armed; btn.classList.remove("confirm"); btn.textContent=btn.dataset.orig; } },4000);
+}
+
+/* ---------- Timer ---------- */
+const T={total:900,left:900,run:false,mode:"Preparation",iv:null,end:0};
+function fmt(s){ const neg=s<0; s=Math.abs(s); return (neg?"+":"")+String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0"); }
+function drawTimer(){
+  $("#tBig").textContent=fmt(T.left); $("#timerChipT").textContent=fmt(T.left); $("#tMode").textContent=T.mode+(T.left<0?" · time is up":"");
+  const chip=$("#timerChip"); chip.classList.toggle("running",T.run); chip.classList.toggle("ending",T.run&&T.left>0&&T.left<=60); chip.classList.toggle("over",T.left<=0&&T.total>0&&(T.run||T.left<0));
+  $("#tStart").textContent=T.run?"Pause":"Start";
+}
+let actx=null;
+function beep(){ try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)(); [0,0.35,0.7].forEach(d=>{ const o=actx.createOscillator(),g=actx.createGain(); o.frequency.value=880; o.connect(g); g.connect(actx.destination); g.gain.setValueAtTime(0.0001,actx.currentTime+d); g.gain.exponentialRampToValueAtTime(0.25,actx.currentTime+d+0.02); g.gain.exponentialRampToValueAtTime(0.0001,actx.currentTime+d+0.28); o.start(actx.currentTime+d); o.stop(actx.currentTime+d+0.3); }); }catch(e){} }
+function tick(){ const prev=T.left; T.left=Math.round((T.end-Date.now())/1000); if(prev>0&&T.left<=0){ beep(); toast(T.mode+" time is up"); } drawTimer(); }
+function setTimer(sec,mode){ clearInterval(T.iv); T.run=false; T.total=sec; T.left=sec; if(mode) T.mode=mode; drawTimer(); }
+$("#tStart").addEventListener("click",()=>{
+  try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)(); if(actx.resume) actx.resume(); }catch(e){}
+  if(T.run){ clearInterval(T.iv); T.run=false; }
+  else { T.end=Date.now()+T.left*1000; T.run=true; T.iv=setInterval(tick,250); }
+  drawTimer();
+});
+$("#tReset").addEventListener("click",()=>setTimer(T.total));
+$$(".presets [data-preset]").forEach(b=>b.addEventListener("click",()=>setTimer(+b.dataset.preset,b.dataset.mode)));
+$("#tSet").addEventListener("click",()=>{ const m=Math.max(1,Math.min(90,+$("#tCustom").value||10)); setTimer(m*60,"Custom"); });
+$("#timerChip").addEventListener("click",()=>{ const p=$("#timerPanel"); p.hidden=!p.hidden; $("#timerChip").setAttribute("aria-expanded",String(!p.hidden)); });
+document.addEventListener("click",e=>{ const p=$("#timerPanel"); if(!p.hidden && !p.contains(e.target) && !e.target.closest("#timerChip")){ p.hidden=true; $("#timerChip").setAttribute("aria-expanded","false"); } });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ $("#timerPanel").hidden=true; $("#modal").hidden=true; } });
+drawTimer();
+
+/* ---------- Theme ---------- */
+function isDark(){ const a=document.documentElement.getAttribute("data-theme"); if(a) return a==="dark"; return window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches; }
+function applyTheme(){ if(S.theme) document.documentElement.setAttribute("data-theme",S.theme); $("#themeLbl").textContent = isDark()?"Light":"Dark"; }
+$("#themeBtn").addEventListener("click",()=>{ S.theme = isDark()?"light":"dark"; save(); applyTheme(); });
+try{ matchMedia("(prefers-color-scheme: dark)").addEventListener("change",applyTheme); }catch(e){}
+applyTheme();
+
+/* ---------- Start ---------- */
+renderMine();
+const h=(location.hash||"").slice(1);
+show(VIEWS.some(v=>v.t===h)?h:(S.view||"brief"));
+})();
+</script>
