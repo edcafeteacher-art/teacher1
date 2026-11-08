@@ -4,7 +4,7 @@
 window.OLYMPIAD_CONFIG = {
   SUPABASE_URL: "",
   SUPABASE_ANON_KEY: "",
-  TIME_LIMIT_MIN: 50,
+  TIME_LIMIT_MIN: 70,
   // Ссылка на видео для аудирования (YouTube). Пока пусто, участник увидит сообщение.
   VIDEO_URL: "https://youtu.be/L2iFafYw9Yc",
 };

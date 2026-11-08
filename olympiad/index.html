@@ -73,6 +73,12 @@ details summary{cursor:pointer;color:var(--accent);font-weight:500}
 .answers{font-size:13px;display:grid;gap:4px;margin-top:8px}
 .essay{white-space:pre-wrap;background:var(--soft);padding:10px;border-radius:4px;max-width:68ch;font-size:14px}
 .oscore{width:72px}
+.gaps p{margin:0 0 12px;line-height:2.1}
+input.gap{width:9.5em;display:inline-block;padding:3px 6px;margin:0 2px}
+.gn{font:600 11px var(--f-mono);color:var(--ochre);margin-left:2px}
+.hint{color:var(--muted);font-style:italic}
+.person{border-left:3px solid var(--line);padding-left:12px}
+.person p{margin:4px 0 0;max-width:68ch}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -80,7 +86,7 @@ details summary{cursor:pointer;color:var(--accent);font-weight:500}
 <div id="app" class="wrap">
   <header class="top">
     <div>
-      <div class="eyebrow">Олимпиада · экономические специальности · 1 курс</div>
+      <div class="eyebrow">Неделя английского языка · экономические специальности</div>
       <h1>Business English Olympiad</h1>
     </div>
     <span class="muted" id="who"></span>
@@ -90,49 +96,38 @@ details summary{cursor:pointer;color:var(--accent);font-weight:500}
 <script src="config.js"></script>
 <script>
 /* ============================ CONTENT ============================
-   Ключи ответов хранятся только в Supabase (таблица settings), здесь их нет. */
+   Ключи ответов хранятся только в Supabase (таблица settings), здесь их нет.
+   В текстах [[n|подсказка]] обозначает пропуск n (нумерация с 1). */
 const CFG = window.OLYMPIAD_CONFIG || {};
+const ART = ["a","an","the","-"];
 const SECTIONS = [
- { id:"G", title:"1. Grammar", each:1,
-   intro:"Выберите один правильный вариант. Проверяются времена, пассивный залог и модальные глаголы.",
-   qs:[
-    {t:"The annual report ___ by the accountant last Friday.", o:["prepared","was prepared","has prepared"]},
-    {t:"Our goods ___ to twenty countries every year.", o:["export","exporting","are exported"]},
-    {t:"The contract ___ yet, so we can't start the project.", o:["hasn't been signed","didn't sign","isn't signing"]},
-    {t:"Employees ___ wear an ID badge at all times. It's a company rule.", o:["might","must","needn't"]},
-    {t:"You ___ pay in cash. We also accept cards.", o:["mustn't","can't","don't have to"]},
-    {t:"It's 8 p.m. The bank ___ have closed already.", o:["must","can't","needn't"]},
-    {t:"He ___ the email. He was in hospital all week.", o:["must have sent","can't have sent","should have sent"]},
-    {t:"Now the delivery is late. We ___ the order earlier.", o:["should have placed","must place","can place"]},
-    {t:"By the end of this year, the company ___ 50 new employees.", o:["has hired","hires","will have hired"]},
-    {t:"When the customer called, the goods ___.", o:["packed","were being packed","have been packed"]},
-    {t:"If the price ___ lower, we would buy more.", o:["were","is","will be"]},
-    {t:"The new tax rules are expected ___ next year.", o:["to introduce","introducing","to be introduced"]}
-   ]},
- { id:"X", title:"2. Language & Logic", each:1,
-   intro:"Лексико-грамматическое задание на логику. Каждый ответ однозначен и оценивается в 1 балл.",
-   parts:[
-    {h:"A. Choose the word that shows the logical link.", from:0, to:4},
-    {h:"B. Choose the correct form of the word.", from:5, to:9},
-    {h:"C. Put the stages of hiring in the logical order. Choose a letter for each step (each letter is used once).", from:10, to:14, order:true}
-   ],
-   qs:[
-    {t:"Sales fell in March. ___, the company cut its prices.", o:["However","As a result","Although"], inl:true},
-    {t:"___ the high costs, the project was a success.", o:["Because","Although","Despite"], inl:true},
-    {t:"Profits rose, ___ costs increased too.", o:["so","but","because"], inl:true},
-    {t:"We hired more staff ___ demand was growing.", o:["although","despite","because"], inl:true},
-    {t:"The product is cheap and reliable. ___, customers buy it again and again.", o:["Therefore","However","Although"], inl:true},
-    {t:"The country's ___ is growing fast.", o:["economic","economy","economical"], inl:true},
-    {t:"We need an ___ car that uses little fuel.", o:["economical","economist","economy"], inl:true},
-    {t:"She works as an ___ at the central bank.", o:["economy","economic","economist"], inl:true},
-    {t:"The company made a large ___ in new equipment.", o:["invest","investor","investment"], inl:true},
-    {t:"Our main ___ is a firm from Germany.", o:["competitor","compete","competitive"], inl:true},
-    {t:"Step 1"},{t:"Step 2"},{t:"Step 3"},{t:"Step 4"},{t:"Step 5"}
-   ],
-   steps:{A:"The best candidate receives a job offer.",B:"The company publishes a job advertisement.",C:"The new employee signs a contract.",D:"Candidates send their CVs.",E:"Shortlisted candidates are invited to an interview."}
- },
- { id:"A", title:"3. Listening", each:2,
-   intro:"Посмотрите видео (можно дважды) и ответьте на вопросы. Ответы не звучат в видео дословно: их нужно вывести из услышанного.",
+ { id:"T", title:"1. Tenses", each:1, n:12, kind:"type",
+   intro:"Put the verbs in brackets into the correct form. Раскройте скобки, поставив глагол в нужную форму (время, залог, -ing).",
+   text:"Dear Anna,\n\nThank you for your email. I [[1|receive]] it yesterday, but I [[2|be]] at a trade fair all day, so I couldn't reply. At the moment our team [[3|prepare]] the annual report, and it [[4|finish]] by Friday. Since January our sales [[5|grow]] by 12 per cent.\n\nLast month we [[6|sign]] a contract with a new supplier from Poland. Their goods are cheaper because they [[7|produce]] in a small town where costs are low. When I [[8|visit]] their factory, the workers [[9|load]] a lorry with our order.\n\nIf you [[10|have]] any questions, please call me. I [[11|send]] you the new figures as soon as I get them. I look forward to [[12|hear]] from you.\n\nBest regards,\nPeter" },
+ { id:"R", title:"2. Articles", each:1, n:10, kind:"select", opts:ART,
+   intro:"Fill the gaps with a / an / the or – (no article). Выберите артикль; «-» означает, что артикль не нужен.",
+   text:"[[1]] small company from Kazan has opened [[2]] online shop. [[3]] shop sells [[4]] tea and coffee at low prices. [[5]] owner, Marat Ilyin, is [[6]] economist by education. He says that [[7]] internet helped him find customers all over [[8]] Russia. Last year [[9]] number of orders doubled, and now he wants to open [[10]] office in Moscow." },
+ { id:"C", title:"3. Open cloze", each:1, n:10, kind:"type",
+   intro:"Read the text and fill each gap with ONE word. Впишите в каждый пропуск одно слово.",
+   text:"Today more and more people pay [[1]] their purchases with a smartphone. This is convenient because you do not need to carry cash [[2]] you. Many small shops have also started [[3]] accept card payments. However, not everyone is happy [[4]] this change. Older people, [[5]] example, often prefer to use cash. Some experts say that cash is safer [[6]] digital money because it cannot be hacked. [[7]] the other hand, digital payments are faster and cheaper for businesses, [[8]] is why banks support them. In the future, cash may disappear completely, [[9]] it is difficult to say when. Whatever happens, we will all have [[10]] learn new ways of managing our money." },
+ { id:"M", title:"4. Word choice", each:1, n:10, kind:"select",
+   intro:"Complete the passage by choosing the word which best fits each gap. Выберите слово, которое лучше всего подходит по смыслу и сочетаемости.",
+   opts:[["dreamed","thought","wondered","hoped"],["set","took","made","put"],["make","do","get","keep"],["high","tall","long","deep"],["take","make","borrow","lend"],["spent","paid","invested","bought"],["willing","wanting","agreeing","liking"],["employed","occupied","worked","used"],["pays","costs","earns","gives"],["on","over","at","in"]],
+   text:"Anna had always [[1]] of running her own business. After college she [[2]] up a small bakery in her home town. At first it was hard to [[3]] ends meet because the rent was very [[4]]. She decided to [[5]] out a bank loan and [[6]] the money in a new oven. Soon her bread became popular, and customers were [[7]] to pay more for quality. Two years later she opened a second shop and [[8]] five new people. Her story shows that hard work really [[9]] off. Today Anna is [[10]] the moon about her results." },
+ { id:"W", title:"5. Word formation", each:1, n:10, kind:"type",
+   intro:"Use the word in brackets to form a word that fits the gap. Образуйте от слова в скобках однокоренное слово, подходящее по смыслу.",
+   text:"Igor Petrov is one of the most [[1|SUCCESS]] young businessmen in our city. Five years ago the [[2|MANAGE]] of a large factory refused his plan, saying it was completely [[3|REAL]]. Igor made a quick [[4|DECIDE]] and started his own firm. Its sales rose [[5|DRAMATIC]] in the first year. The [[6|GROW]] of online trade helped him a lot. Igor knows that many young people face [[7|EMPLOY]] after college, so he hires graduates. He also works with a financial [[8|ADVISE]], because customers expect [[9|RELY]] service and stable prices. Now he spends money on the [[10|DEVELOP]] of new products." },
+ { id:"P", title:"6. Reading: careers", each:1, n:10, kind:"match",
+   intro:"Read about five people and their careers in economics. For questions 1–10, choose from the people A–E. The people may be chosen more than once.",
+   people:[
+    ["A","Olga, accountant","I chose accounting because my father, who is an accountant himself, told me it was a stable job. At first I was terrible at using the accounting software and made lots of mistakes, but my colleagues were patient with me. Now I work long hours during the tax season, so in spring I rarely see my friends."],
+    ["B","Daniel, logistics specialist","After college I moved to Germany to work for a large logistics company. I noticed that our drivers wasted hours waiting at warehouses, so I suggested a new booking system for deliveries. My manager accepted the idea, and now the drivers finish work much earlier."],
+    ["C","Irina, bank employee","I never planned to work in a bank. I wanted to be a journalist, but journalists' pay is often unpredictable, so I took a job as a bank clerk to have a regular salary. I enjoy talking to clients, and last year I became a customer service manager."],
+    ["D","Pavel, online seller","I learnt everything about online sales from videos and books, and I have never taken a business course. I started by selling phone cases from my flat. Thanks to good reviews from my first customers, more and more people trust my shop, and now I'm hiring two assistants."],
+    ["E","Maria, junior auditor","Many of my friends went to university, but I believe practical experience is more valuable than lectures. That's why I joined an audit firm as an intern straight after college. I asked my boss to let me check a real client's documents, and he was so impressed with my work that he offered me a permanent contract."]],
+   qs:["Which person changed their career plans because they wanted a steady income?","Which person admits they were not good at one part of their job at first?","Which person benefited from showing what they could do?","Which person made a suggestion that improved colleagues' working conditions?","Which person thinks work experience is better than higher education?","Which person went abroad to work?","Which person followed a parent's advice?","Which person is self-taught in their field?","Which person used their good reputation to grow their business?","Which person has a limited social life at a certain time of year?"] },
+ { id:"A", title:"7. Listening", each:2, kind:"mcq",
+   intro:"Посмотрите видео (можно дважды) и ответьте на вопросы. Ответы не звучат в видео дословно, их нужно вывести из услышанного.",
    qs:[
     {t:"Why does the narrator mention that there are no rivers near Stonehenge?", o:["To explain why it was easy to bring the stones.","To show that the choice of the place is a puzzle.","To prove that the builders came from Wales."]},
     {t:"Ian says that about 6,000 people come on an average summer day and over a million people visit in a year. What can we conclude?", o:["The site gets the same number of visitors every day.","There are far fewer visitors per day outside the summer.","Most visitors come in winter."]},
@@ -143,9 +138,9 @@ const SECTIONS = [
     {t:"Which of these does Ian present as known for sure, not as a theory?", o:["The monument is aligned with the summer and winter solstices.","It was built by people from another planet.","It was a monument to the ancestors."]},
     {t:"What is the main idea of the end of the video?", o:["New technology shows the site is more complex than people thought.","Scientists now know everything about Stonehenge.","The stones under the ground were added recently."]}
    ],
-   open:{t:"Stonehenge receives more than a million visitors a year. Imagine you are an economist. Name two ways the monument benefits the local economy and one problem that mass tourism can cause. Write 40–60 words.", max:4}
- }
+   open:{t:"Stonehenge receives more than a million visitors a year. Imagine you are an economist. Name two ways the monument benefits the local economy and one problem that mass tourism can cause. Write 40–60 words.", max:4} }
 ];
+SECTIONS.forEach(s=>{ if(!s.n) s.n=s.qs.length; });
 
 /* ============================ HELPERS ============================ */
 const $ = s => document.querySelector(s);
@@ -154,7 +149,7 @@ const el = (tag, attrs={}, ...kids) => { const e=document.createElement(tag);
   for (const k of kids) if (k!=null) e.append(k); return e; };
 const words = s => (s||"").trim().split(/\s+/).filter(Boolean).length;
 const fmtTime = ms => { const s=Math.max(0,Math.floor(ms/1000)); return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0"); };
-const store = { get(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } }, set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }, del(k){ try{ localStorage.removeItem(k);}catch(e){} } };
+const store = { get(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } }, set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} } };
 const configured = () => CFG.SUPABASE_URL && CFG.SUPABASE_ANON_KEY;
 async function rpc(fn, body){
   const r = await fetch(`${CFG.SUPABASE_URL.replace(/\/$/,"")}/rest/v1/rpc/${fn}`, { method:"POST",
@@ -162,15 +157,14 @@ async function rpc(fn, body){
   const txt = await r.text(); const data = txt ? JSON.parse(txt) : null;
   if (!r.ok) throw new Error(data?.message || ("HTTP "+r.status)); return data; }
 function ytId(url){ const m=String(url||"").match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([A-Za-z0-9_-]{11})/); return m?m[1]:null; }
-const LETTERS="ABCDE";
-const maxOf = sec => sec.qs.length*sec.each + (sec.open?.t ? sec.open.max : 0);
-
-/* ============================ ROUTER ============================ */
+const maxOf = sec => sec.n*sec.each + (sec.open?.t ? sec.open.max : 0);
+const OPEN_MAX = SECTIONS.reduce((s,x)=>s+(x.open?.t?x.open.max:0),0);
+const TOTAL = SECTIONS.reduce((s,x)=>s+maxOf(x),0);
 const main = $("#main");
 
 /* ============================ STUDENT ============================ */
-let rec=null, current="G", tick=null;
-const DRAFT="olymp_draft_v1";
+let rec=null, current=SECTIONS[0].id, tick=null;
+const DRAFT="olymp_draft_v2";
 
 function bootStudent(){
   $("#who").textContent="Участник";
@@ -182,20 +176,20 @@ function bootStudent(){
 }
 
 function renderLogin(){
-  const total = SECTIONS.reduce((s,x)=>s+maxOf(x),0);
   const f = el("form",{class:"card"});
   f.append(
     el("div",{}, el("div",{class:"eyebrow",text:"Вход участника"}), el("h2",{text:"Представьтесь перед началом"})),
-    el("p",{class:"muted",text:`Три задания: грамматика, язык и логика, аудирование по видео. Максимум ${total} баллов. Время ${CFG.TIME_LIMIT_MIN||50} минут, таймер запускается после нажатия «Начать». Работу можно отправить только один раз.`}),
+    el("p",{class:"muted",text:`${SECTIONS.length} заданий: времена, артикли, открытый cloze, выбор слова, словообразование, чтение и аудирование по видео. Максимум ${TOTAL} баллов. Время ${CFG.TIME_LIMIT_MIN||70} минут, таймер запускается после нажатия «Начать». Работу можно отправить только один раз.`}),
     el("div",{class:"grid2"},
       el("label",{class:"f"},"Фамилия*", el("input",{type:"text",id:"surname",required:true,autocomplete:"family-name"})),
       el("label",{class:"f"},"Имя*", el("input",{type:"text",id:"fname",required:true,autocomplete:"given-name"})),
       el("label",{class:"f"},"Группа*", el("input",{type:"text",id:"group",required:true,placeholder:"например, ЭК-11"})),
       el("label",{class:"f"},"Код участника", el("input",{type:"text",id:"pcode",placeholder:"если выдан"}))),
-    el("div",{class:"note",text:"Для аудирования понадобятся наушники. Не закрывайте и не перезагружайте вкладку без необходимости: черновик хранится в этом браузере."}),
+    el("div",{class:"note",text:"Для аудирования понадобятся наушники. Не закрывайте вкладку без необходимости: черновик хранится в этом браузере."}),
     el("div",{class:"row"}, el("button",{type:"submit",text:"Начать олимпиаду"})));
   f.addEventListener("submit", e=>{ e.preventDefault(); const v=id=>$("#"+id).value.trim();
-    rec={surname:v("surname"),name:v("fname"),group:v("group"),code:v("pcode"),status:"in_progress",startedAt:Date.now(),answers:{G:[],X:[],A:[],open:""},leaves:0};
+    const answers={open:""}; SECTIONS.forEach(s=>answers[s.id]=[]);
+    rec={surname:v("surname"),name:v("fname"),group:v("group"),code:v("pcode"),status:"in_progress",startedAt:Date.now(),answers,leaves:0};
     store.set(DRAFT,rec); main.replaceChildren(); startExam(); });
   main.append(f);
 }
@@ -208,21 +202,32 @@ function startExam(){
   document.addEventListener("visibilitychange",()=>{ if(document.hidden && rec.status!=="submitted"){ rec.leaves++; save(); } });
 }
 const save = () => store.set(DRAFT,rec);
-function updateTimer(){ const left=rec.startedAt+(CFG.TIME_LIMIT_MIN||50)*60000-Date.now(); const t=$("#timer"); if(!t) return;
+function updateTimer(){ const left=rec.startedAt+(CFG.TIME_LIMIT_MIN||70)*60000-Date.now(); const t=$("#timer"); if(!t) return;
   t.textContent="⏱ "+fmtTime(left); t.classList.toggle("low",left<5*60000); if(left<=0){ clearInterval(tick); submit(true); } }
 function go(id){ current=id; renderTabs(); renderSection(); scrollTo({top:0}); }
 function renderTabs(){ const nav=$("#tabs"); nav.replaceChildren();
   SECTIONS.forEach(s=>nav.append(el("button",{type:"button","aria-current":String(current===s.id),onclick:()=>go(s.id)}, s.title, el("span",{class:"pts",text:maxOf(s)+" б."}))));
   nav.append(el("button",{type:"button","aria-current":String(current==="S"),onclick:()=>go("S")},"Отправка")); }
 function setAns(sec,i,v){ rec.answers[sec] ||= []; rec.answers[sec][i]=v; save(); }
+const cur = (sec,i) => (rec.answers[sec]||[])[i] ?? "";
 
-function choice(sec,i,q){
-  const cur=(rec.answers[sec.id]||[])[i];
-  if (q.inl){ const s=el("select",{class:"inl",id:`${sec.id}${i}`,"aria-label":`${sec.id}${i+1}`,onchange:e=>setAns(sec.id,i,e.target.value)}, el("option",{value:"",text:"— choose —"}));
-    q.o.forEach(o=>s.append(el("option",{value:o,text:o,selected:cur===o}))); const [a,b]=q.t.split("___"); return el("div",{},a,s,b||""); }
-  const box=el("div",{class:"opts",role:"radiogroup"});
-  q.o.forEach((o,k)=>{ const id=`${sec.id}${i}_${k}`; box.append(el("label",{for:id}, el("input",{type:"radio",name:`${sec.id}${i}`,id,value:o,checked:cur===o,onchange:()=>setAns(sec.id,i,o)}), el("span",{text:`${"abc"[k]}) ${o}`}))); });
-  return el("div",{}, el("div",{text:q.t}), box);
+function selectFor(sec,i,opts,label){
+  const s=el("select",{class:"inl",id:`${sec}${i}`,"aria-label":label,onchange:e=>setAns(sec,i,e.target.value)}, el("option",{value:"",text:"—"}));
+  opts.forEach(o=>s.append(el("option",{value:o,text:o==="-"?"– (no article)":o,selected:cur(sec,i)===o}))); return s; }
+
+function gapText(sec){
+  const box=el("div",{class:"text gaps"});
+  sec.text.split("\n\n").forEach(par=>{
+    const p=el("p",{}); let last=0; const re=/\[\[(\d+)(?:\|([^\]]*))?\]\]/g; let m;
+    while((m=re.exec(par))){ p.append(par.slice(last,m.index)); const i=Number(m[1])-1;
+      p.append(el("sup",{class:"gn",text:m[1]}));
+      if (sec.kind==="type"){ const inp=el("input",{type:"text",class:"gap",id:`${sec.id}${i}`,"aria-label":`Gap ${m[1]}`,autocomplete:"off",autocapitalize:"off",spellcheck:"false",value:cur(sec.id,i)});
+        inp.addEventListener("input",()=>setAns(sec.id,i,inp.value.trim())); p.append(inp); }
+      else p.append(selectFor(sec.id,i, Array.isArray(sec.opts[0])?sec.opts[i]:sec.opts, `Gap ${m[1]}`));
+      if (m[2]) p.append(el("span",{class:"hint",text:` (${m[2]})`}));
+      last=re.lastIndex; }
+    p.append(par.slice(last)); par.split("\n").length>1 ? (p.style.whiteSpace="pre-line") : 0; box.append(p); });
+  return box;
 }
 
 function renderSection(){
@@ -230,26 +235,23 @@ function renderSection(){
   if (current==="S") return renderSubmit(pane);
   const sec=SECTIONS.find(s=>s.id===current);
   const card=el("section",{class:"card"}, el("div",{}, el("div",{class:"eyebrow",text:maxOf(sec)+" баллов"}), el("h2",{text:sec.title})), el("p",{text:sec.intro}));
-  if (sec.id==="A"){
+  if (sec.text) card.append(gapText(sec));
+  if (sec.kind==="match"){
+    sec.people.forEach(([L,name,txt])=>card.append(el("div",{class:"person"}, el("h3",{text:`${L}. ${name}`}), el("p",{text:txt}))));
+    sec.qs.forEach((q,i)=>card.append(el("div",{class:"q"}, el("div",{class:"row"}, el("span",{class:"n",text:String(i+1)}), el("span",{style:"flex:1;min-width:200px",text:q}), selectFor(sec.id,i,["A","B","C","D","E"],`Question ${i+1}`)))));
+  }
+  if (sec.kind==="mcq"){
     const id=ytId(CFG.VIDEO_URL);
     if (id) card.append(el("div",{class:"video"}, el("iframe",{src:`https://www.youtube-nocookie.com/embed/${id}?rel=0`,title:"Listening video",allow:"encrypted-media; picture-in-picture",allowfullscreen:true})),
       el("p",{class:"muted"},"Если видео не открывается, используйте ссылку: ", el("a",{href:CFG.VIDEO_URL,target:"_blank",rel:"noopener",text:CFG.VIDEO_URL})));
     else card.append(el("div",{class:"note err",text:"Видео ещё не добавлено. Сообщите преподавателю."}));
-    if (!sec.qs.length) card.append(el("p",{class:"muted",text:"Вопросы к видео появятся здесь."}));
+    sec.qs.forEach((q,i)=>{ const box=el("div",{class:"opts",role:"radiogroup"});
+      q.o.forEach((o,k)=>{ const id=`${sec.id}${i}_${k}`; box.append(el("label",{for:id}, el("input",{type:"radio",name:`${sec.id}${i}`,id,value:o,checked:cur(sec.id,i)===o,onchange:()=>setAns(sec.id,i,o)}), el("span",{text:`${"abc"[k]}) ${o}`}))); });
+      card.append(el("div",{class:"q"}, el("div",{class:"n",text:`${i+1}`}), el("div",{text:q.t}), box)); });
+    if (sec.open?.t){ const ta=el("textarea",{id:"open",placeholder:"Your answer in English…"}); ta.value=rec.answers.open||""; const wc=el("span",{class:"muted"});
+      const upd=()=>wc.textContent=`Слов: ${words(ta.value)}`; ta.addEventListener("input",()=>{ rec.answers.open=ta.value; save(); upd(); }); upd();
+      card.append(el("div",{class:"q"}, el("div",{class:"n",text:`Open question · ${sec.open.max} б. (проверяет преподаватель)`}), el("div",{text:sec.open.t}), ta, wc)); }
   }
-  const block=(i,q)=>el("div",{class:"q"}, el("div",{class:"n",text:`${sec.id}${i+1}`}), choice(sec,i,q));
-  if (sec.parts){
-    sec.parts.forEach(p=>{ card.append(el("h3",{text:p.h}));
-      if (p.order){ const t=el("div",{class:"text"}); Object.entries(sec.steps).forEach(([k,v])=>t.append(el("div",{text:`${k}) ${v}`}))); card.append(t);
-        const row=el("div",{class:"row"});
-        for(let i=p.from;i<=p.to;i++){ const cur=(rec.answers.X||[])[i]; const s=el("select",{class:"inl",id:`X${i}`,"aria-label":`Step ${i-p.from+1}`,onchange:e=>setAns("X",i,e.target.value)}, el("option",{value:"",text:"—"}));
-          LETTERS.split("").forEach(L=>s.append(el("option",{value:L,text:L,selected:cur===L}))); row.append(el("label",{for:`X${i}`,class:"row"},`Step ${i-p.from+1}`,s)); }
-        card.append(row);
-      } else for(let i=p.from;i<=p.to;i++) card.append(block(i,sec.qs[i])); });
-  } else sec.qs.forEach((q,i)=>card.append(block(i,q)));
-  if (sec.open?.t){ const ta=el("textarea",{id:"open",placeholder:"Your answer in English…"}); ta.value=rec.answers.open||""; const wc=el("span",{class:"muted"});
-    const upd=()=>wc.textContent=`Слов: ${words(ta.value)}`; ta.addEventListener("input",()=>{ rec.answers.open=ta.value; save(); upd(); }); upd();
-    card.append(el("div",{class:"q"}, el("div",{class:"n",text:`Open question · ${sec.open.max} б. (проверяет преподаватель)`}), el("div",{text:sec.open.t}), ta, wc)); }
   const idx=SECTIONS.indexOf(sec);
   card.append(el("div",{class:"row"}, el("button",{type:"button",onclick:()=>go(SECTIONS[idx+1]?.id||"S"),text:SECTIONS[idx+1]?"Следующее задание →":"К отправке →"})));
   pane.append(card);
@@ -257,8 +259,7 @@ function renderSection(){
 
 function renderSubmit(pane){
   const miss=[];
-  SECTIONS.forEach(s=>{ const n=s.qs.filter((_,i)=>!(rec.answers[s.id]||[])[i]).length; if(n) miss.push(`${s.title}: без ответа ${n}`); });
-  const order=(rec.answers.X||[]).slice(10,15).filter(Boolean); if(new Set(order).size!==order.length) miss.push("2C: одна буква выбрана дважды");
+  SECTIONS.forEach(s=>{ let n=0; for(let i=0;i<s.n;i++) if(!cur(s.id,i)) n++; if(n) miss.push(`${s.title}: без ответа ${n}`); });
   pane.append(el("section",{class:"card"}, el("h2",{text:"Отправка работы"}),
     miss.length? el("div",{class:"note err"}, el("b",{text:"Проверьте: "}), miss.join("; ")) : el("div",{class:"note",text:"Все задания заполнены."}),
     el("p",{text:"После отправки изменить ответы нельзя. Когда время закончится, работа отправится автоматически."}),
@@ -283,9 +284,7 @@ function renderDone(){
 }
 
 /* ============================ TEACHER ============================ */
-let PIN="", rows=[], threshold=Number(store.get("olymp_thr"))||0, poll=null;
-const TOTAL = SECTIONS.reduce((s,x)=>s+maxOf(x),0);
-if (!threshold) threshold=Math.round(TOTAL*0.7);
+let PIN="", rows=[], threshold=Number(store.get("olymp_thr"))||Math.round(TOTAL*0.7), poll=null;
 
 function renderTeacherLogin(){
   $("#who").textContent="Преподаватель";
@@ -308,46 +307,47 @@ function renderTeacher(){
           el("label",{class:"row",for:"thr"},"Проходной балл", el("input",{type:"number",id:"thr",min:0,max:TOTAL,value:threshold,style:"width:80px",oninput:e=>{threshold=Number(e.target.value)||0; store.set("olymp_thr",threshold); draw();}}), el("span",{class:"muted",text:"из "+TOTAL})),
           el("button",{type:"button",class:"ghost",onclick:refresh,text:"Обновить"}),
           el("button",{type:"button",class:"ghost",onclick:csv,text:"Скачать CSV"}))),
-      el("p",{class:"muted"},"Баллы за закрытые вопросы считает сервер по ключу. Открытый вопрос по видео оцените вручную (0–4). ", el("span",{id:"upd"})),
+      el("p",{class:"muted"},`Баллы за закрытые задания считает сервер по ключу. Открытый вопрос по видео оцените вручную (0–${OPEN_MAX}). `, el("span",{id:"upd"})),
       el("div",{class:"scroll"}, el("table",{id:"tbl"})),
       el("p",{class:"muted",id:"tmsg"})));
   draw(); poll=setInterval(refresh,20000);
 }
 
 function draw(){
-  const openMax=SECTIONS.find(s=>s.id==="A").open?.t ? SECTIONS.find(s=>s.id==="A").open.max : 0;
-  const data=rows.map(r=>({...r, total:(r.auto_score||0)+(r.open_score||0), needs: openMax>0 && r.open_score==null}))
+  const data=rows.map(r=>({...r, total:(r.auto_score||0)+(r.open_score||0), needs: OPEN_MAX>0 && r.open_score==null}))
     .sort((a,b)=>b.total-a.total||(a.surname||"").localeCompare(b.surname||"","ru"));
   const avg=data.length?(data.reduce((s,r)=>s+r.total,0)/data.length).toFixed(1):"—";
   $("#stats").replaceChildren(...[[data.length,"работ отправлено"],[data.filter(r=>r.needs).length,"ждут проверки открытого ответа"],[avg,"средний балл"],[data.filter(r=>!r.needs&&r.total>=threshold).length,`прошли порог ${threshold}`]]
     .map(([b,s])=>el("div",{class:"stat"}, el("b",{text:String(b)}), el("span",{text:s}))));
-  const t=$("#tbl"); t.replaceChildren(el("tr",{}, ...["№","Участник","Группа","Код",`Grammar /${maxOf(SECTIONS[0])}`,`Logic /${maxOf(SECTIONS[1])}`,`Listening /${SECTIONS[2].qs.length*2}`,`Открытый /${openMax}`,`Итого /${TOTAL}`,"Решение"].map((h,i)=>el("th",{class:i>=4&&i<=8?"num":"",text:h}))));
-  if(!data.length){ t.append(el("tr",{}, el("td",{colspan:10,class:"muted",text:"Пока ни одной отправленной работы."}))); return; }
+  const head=["№","Участник","Группа",...SECTIONS.map(s=>`${s.title.split(". ")[0]} /${s.n*s.each}`),`Откр. /${OPEN_MAX}`,`Итого /${TOTAL}`,"Решение"];
+  const t=$("#tbl"); t.replaceChildren(el("tr",{}, ...head.map((h,i)=>el("th",{class:i>=3&&i<head.length-1?"num":"",text:h}))));
+  if(!data.length){ t.append(el("tr",{}, el("td",{colspan:head.length,class:"muted",text:"Пока ни одной отправленной работы."}))); return; }
   data.forEach((r,i)=>{
     const sc=r.scores||{};
-    const os=el("input",{type:"number",min:0,max:openMax,class:"oscore","aria-label":"Балл за открытый ответ",value:r.open_score??"",disabled:!openMax});
-    os.addEventListener("change",async()=>{ const v=os.value===""?null:Math.max(0,Math.min(openMax,Math.round(Number(os.value))));
+    const os=el("input",{type:"number",min:0,max:OPEN_MAX,class:"oscore","aria-label":"Балл за открытый ответ",value:r.open_score??""});
+    os.addEventListener("change",async()=>{ const v=os.value===""?null:Math.max(0,Math.min(OPEN_MAX,Math.round(Number(os.value))));
       try{ await rpc("set_open_score",{pin:PIN,rid:r.id,s:v}); r.open_score=v; draw(); }catch(e){ $("#tmsg").textContent="Не удалось сохранить: "+e.message; } });
-    const flags=[]; if(r.leaves) flags.push(`уходил(а) со вкладки: ${r.leaves}`); if(r.auto_submitted) flags.push("отправлено по таймеру");
+    const flags=[]; if(r.code) flags.push(`код: ${r.code}`); if(r.leaves) flags.push(`уходил(а) со вкладки: ${r.leaves}`); if(r.auto_submitted) flags.push("отправлено по таймеру");
     if(r.started_at&&r.submitted_at) flags.push(`время работы: ${Math.round((new Date(r.submitted_at)-new Date(r.started_at))/60000)} мин`);
     const a=r.answers||{};
     const det=el("details",{}, el("summary",{text:"ответы"}), el("div",{class:"answers"},
-      ...["G","X","A"].map(k=>el("div",{text:`${k}: `+(a[k]||[]).map((v,j)=>`${j+1}) ${v||"—"}`).join("; ")})),
+      ...SECTIONS.map(s=>el("div",{text:`${s.title}: `+Array.from({length:s.n},(_,j)=>`${j+1}) ${(a[s.id]||[])[j]||"—"}`).join("; ")})),
       el("div",{class:"muted",text:flags.join(" · ")||"замечаний нет"}),
       el("div",{class:"essay",text:a.open||"(открытый ответ пуст)"})));
     const dec = r.needs ? el("span",{class:"pill wait",text:"проверить"}) : el("span",{class:"pill "+(r.total>=threshold?"ok":"bad"),text:r.total>=threshold?"проходит":"не проходит"});
-    t.append(el("tr",{}, el("td",{class:"num",text:String(i+1)}), el("td",{}, el("div",{text:`${r.surname} ${r.name}`}),det), el("td",{text:r.grp||""}), el("td",{text:r.code||""}),
-      ...["G","X","A"].map(k=>el("td",{class:"num",text:String(sc[k]??0)})), el("td",{class:"num"},os), el("td",{class:"num"},el("b",{text:String(r.total)})), el("td",{},dec)));
+    t.append(el("tr",{}, el("td",{class:"num",text:String(i+1)}), el("td",{}, el("div",{text:`${r.surname} ${r.name}`}),det), el("td",{text:r.grp||""}),
+      ...SECTIONS.map(s=>el("td",{class:"num",text:String(sc[s.id]??0)})), el("td",{class:"num"},os), el("td",{class:"num"},el("b",{text:String(r.total)})), el("td",{},dec)));
   });
 }
 
 function csv(){
   const esc=v=>`"${String(v??"").replace(/"/g,'""')}"`;
-  const lines=[["Фамилия","Имя","Группа","Код","Grammar","Logic","Listening","Открытый","Итого","Решение","Уходы со вкладки","Отправлено"].map(esc).join(";")];
+  const lines=[["Фамилия","Имя","Группа","Код",...SECTIONS.map(s=>s.title),"Открытый","Итого","Решение","Уходы со вкладки","Отправлено"].map(esc).join(";")];
   rows.map(r=>({...r,total:(r.auto_score||0)+(r.open_score||0)})).sort((a,b)=>b.total-a.total).forEach(r=>{ const s=r.scores||{};
-    lines.push([r.surname,r.name,r.grp,r.code,s.G??0,s.X??0,s.A??0,r.open_score??"",r.total,r.total>=threshold?"проходит":"не проходит",r.leaves||0,r.submitted_at?new Date(r.submitted_at).toLocaleString("ru-RU"):""].map(esc).join(";")); });
+    lines.push([r.surname,r.name,r.grp,r.code,...SECTIONS.map(x=>s[x.id]??0),r.open_score??"",r.total,r.total>=threshold?"проходит":"не проходит",r.leaves||0,r.submitted_at?new Date(r.submitted_at).toLocaleString("ru-RU"):""].map(esc).join(";")); });
   const a=el("a",{href:URL.createObjectURL(new Blob(["﻿"+lines.join("\n")],{type:"text/csv"})),download:"olympiad_results.csv"}); document.body.append(a); a.click(); a.remove();
 }
+
 if (location.hash === "#teacher") renderTeacherLogin(); else bootStudent();
 addEventListener("hashchange", ()=>location.reload());
 </script>

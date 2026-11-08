@@ -37,25 +37,42 @@ alter table public.settings enable row level security;
 alter table public.results  enable row level security;
 revoke all on public.settings, public.results from anon, authenticated;
 
+-- Ключ. Строка означает один правильный ответ, массив означает несколько допустимых.
+-- Сравнение без учёта регистра, лишних пробелов и типа апострофа.
 insert into public.settings (id, teacher_pin, answer_key, points) values (1, 'CHANGE-ME-PIN',
- '{
-   "G": ["was prepared","are exported","hasn''t been signed","must","don''t have to","must","can''t have sent","should have placed","will have hired","were being packed","were","to be introduced"],
-   "X": ["As a result","Despite","but","because","Therefore","economy","economical","economist","investment","competitor","B","D","E","A","C"],
+ $key${
+   "T": ["received","was","is preparing",["will be finished","is going to be finished","will have been finished","should be finished"],["have grown","have been growing"],"signed","are produced","visited","were loading","have",["will send","am going to send"],"hearing"],
+   "R": ["a","an","the","-","the","an","the","-","the","an"],
+   "C": ["for","with","to",["with","about"],"for","than","on","which",["but","although","though","yet"],"to"],
+   "M": ["dreamed","set","make","high","take","invested","willing","employed","pays","over"],
+   "W": ["successful","management","unrealistic","decision","dramatically","growth","unemployment",["adviser","advisor"],"reliable","development"],
+   "P": ["C","A","E","B","E","B","A","D","D","A"],
    "A": ["To show that the choice of the place is a puzzle.","There are far fewer visitors per day outside the summer.","about 500 years older.","They found remains of huts at Durrington Walls.","The bluestones travelled about ten times farther than the sarsen stones.","They could organise a large number of workers.","The monument is aligned with the summer and winter solstices.","New technology shows the site is more complex than people thought."]
- }'::jsonb,
- '{"G":1,"X":1,"A":2}'::jsonb)
+ }$key$::jsonb,
+ '{"T":1,"R":1,"C":1,"M":1,"W":1,"P":1,"A":2}'::jsonb)
 on conflict (id) do update set answer_key = excluded.answer_key, points = excluded.points;
+
+create or replace function public.norm(t text) returns text
+language sql immutable as $$
+  select regexp_replace(replace(replace(lower(trim(coalesce(t,''))), '’', ''''), '‘', ''''), '\s+', ' ', 'g')
+$$;
 
 -- Подсчёт баллов по ключу
 create or replace function public.score_answers(a jsonb) returns jsonb
 language plpgsql stable security definer set search_path = public as $$
-declare k jsonb; pts jsonb; sec text; i int; c int; p int; s jsonb := '{}'; tot int := 0;
+declare k jsonb; pts jsonb; sec text; i int; c int; p int; e jsonb; ans text; s jsonb := '{}'; tot int := 0;
 begin
   select answer_key, points into k, pts from settings where id = 1;
   for sec in select jsonb_object_keys(k) loop
     c := 0;
     for i in 0 .. jsonb_array_length(k -> sec) - 1 loop
-      if lower(trim(coalesce(a -> sec ->> i, ''))) = lower(k -> sec ->> i) then c := c + 1; end if;
+      e := k -> sec -> i;
+      ans := norm(a -> sec ->> i);
+      if ans <> '' and (
+           (jsonb_typeof(e) = 'array' and exists (select 1 from jsonb_array_elements_text(e) x where norm(x) = ans))
+        or (jsonb_typeof(e) = 'string' and norm(e #>> '{}') = ans)) then
+        c := c + 1;
+      end if;
     end loop;
     p := coalesce((pts ->> sec)::int, 1);
     s := s || jsonb_build_object(sec, c * p);
