@@ -159,7 +159,7 @@ const store = { get(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(
 const configured = () => CFG.SUPABASE_URL && CFG.SUPABASE_ANON_KEY;
 async function rpc(fn, body){
   const r = await fetch(`${CFG.SUPABASE_URL.replace(/\/$/,"")}/rest/v1/rpc/${fn}`, { method:"POST",
-    headers:{ "apikey":CFG.SUPABASE_ANON_KEY, "Authorization":"Bearer "+CFG.SUPABASE_ANON_KEY, "Content-Type":"application/json" }, body:JSON.stringify(body) });
+    headers:Object.assign({ "apikey":CFG.SUPABASE_ANON_KEY, "Content-Type":"application/json" }, CFG.SUPABASE_ANON_KEY.startsWith("eyJ") ? { "Authorization":"Bearer "+CFG.SUPABASE_ANON_KEY } : {}), body:JSON.stringify(body) });
   const txt = await r.text(); const data = txt ? JSON.parse(txt) : null;
   if (!r.ok) throw new Error(data?.message || ("HTTP "+r.status)); return data; }
 function ytId(url){ const m=String(url||"").match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([A-Za-z0-9_-]{11})/); return m?m[1]:null; }
