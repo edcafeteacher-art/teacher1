@@ -2,7 +2,7 @@
 // Project Settings → API → Project URL и anon public key.
 // anon key публичный по замыслу Supabase; доступ к ответам закрыт функциями в supabase/schema.sql.
 window.OLYMPIAD_CONFIG = {
-  SUPABASE_URL: "",
+  SUPABASE_URL: "https://rmihoavqvvqtdyvdcyxq.supabase.co",
   SUPABASE_ANON_KEY: "sb_publishable_K4wXLNZgMuImTCDuyTNESw_mQDHnJDP",
   TIME_LIMIT_MIN: 70,
   // Ссылка на видео для аудирования (YouTube). Пока пусто, участник увидит сообщение.
