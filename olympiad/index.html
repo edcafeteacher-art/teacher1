@@ -297,11 +297,19 @@ function renderTeacherLogin(){
   const f=el("form",{class:"card"}, el("h2",{text:"Вход преподавателя"}),
     el("label",{class:"f"},"PIN преподавателя", el("input",{type:"password",id:"pin",required:true,autocomplete:"current-password"})),
     el("div",{class:"row"}, el("button",{type:"submit",text:"Открыть результаты"}), el("span",{class:"muted",id:"pmsg"})));
-  f.addEventListener("submit",async e=>{ e.preventDefault(); PIN=$("#pin").value; $("#pmsg").textContent="Проверяем…";
-    try{ rows=await rpc("olymp_get_results",{pin:PIN}); renderTeacher(); }catch(err){ $("#pmsg").textContent="Не удалось войти: "+err.message; } });
+  const enter=async pin=>{ PIN=pin; $("#pmsg").textContent="Проверяем…";
+    try{ rows=await rpc("olymp_get_results",{pin:PIN}); store.set("olymp_pin",PIN); renderTeacher(); }
+    catch(err){ store.set("olymp_pin",null); $("#pmsg").textContent="Не удалось войти: "+err.message; } };
+  f.addEventListener("submit",e=>{ e.preventDefault(); enter($("#pin").value); });
   if(!configured()) f.append(el("div",{class:"note err",text:"Заполните SUPABASE_URL и SUPABASE_ANON_KEY в config.js."}));
   main.append(f);
+  // Личная ссылка преподавателя: …/#teacher=PIN открывает панель без ввода. PIN сразу убирается из адресной строки.
+  const fromLink=decodeURIComponent((location.hash.match(/^#teacher=(.+)$/)||[])[1]||"");
+  if (fromLink){ history.replaceState(null,"",location.pathname+"#teacher"); enter(fromLink); }
+  else if (store.get("olymp_pin")) enter(store.get("olymp_pin"));
 }
+const openOf = r => r.open_score ?? r.scores?.O ?? 0;
+const totalOf = r => (r.auto_score||0) + openOf(r);
 async function refresh(){ try{ rows=await rpc("olymp_get_results",{pin:PIN}); draw(); $("#upd").textContent="обновлено "+new Date().toLocaleTimeString("ru-RU"); }catch(e){ $("#upd").textContent="ошибка обновления: "+e.message; } }
 
 function renderTeacher(){
@@ -313,24 +321,24 @@ function renderTeacher(){
           el("label",{class:"row",for:"thr"},"Проходной балл", el("input",{type:"number",id:"thr",min:0,max:TOTAL,value:threshold,style:"width:80px",oninput:e=>{threshold=Number(e.target.value)||0; store.set("olymp_thr",threshold); draw();}}), el("span",{class:"muted",text:"из "+TOTAL})),
           el("button",{type:"button",class:"ghost",onclick:refresh,text:"Обновить"}),
           el("button",{type:"button",class:"ghost",onclick:csv,text:"Скачать CSV"}))),
-      el("p",{class:"muted"},`Баллы за закрытые задания считает сервер по ключу. Открытый вопрос по видео оцените вручную (0–${OPEN_MAX}). `, el("span",{id:"upd"})),
+      el("p",{class:"muted"},`Все баллы считаются автоматически. Открытый ответ оценивается по трём критериям: объём 30–80 слов (1 балл), названы выгоды для экономики (до 2 баллов), назван риск туризма (1 балл). Если не согласны, впишите свой балл в колонку «Откр.», он заменит автоматический. `, el("span",{id:"upd"})),
       el("div",{class:"scroll"}, el("table",{id:"tbl"})),
       el("p",{class:"muted",id:"tmsg"})));
   draw(); poll=setInterval(refresh,20000);
 }
 
 function draw(){
-  const data=rows.map(r=>({...r, total:(r.auto_score||0)+(r.open_score||0), needs: OPEN_MAX>0 && r.open_score==null}))
+  const data=rows.map(r=>({...r, total:totalOf(r), needs:false}))
     .sort((a,b)=>b.total-a.total||(a.surname||"").localeCompare(b.surname||"","ru"));
   const avg=data.length?(data.reduce((s,r)=>s+r.total,0)/data.length).toFixed(1):"—";
-  $("#stats").replaceChildren(...[[data.length,"работ отправлено"],[data.filter(r=>r.needs).length,"ждут проверки открытого ответа"],[avg,"средний балл"],[data.filter(r=>!r.needs&&r.total>=threshold).length,`прошли порог ${threshold}`]]
+  $("#stats").replaceChildren(...[[data.length,"работ отправлено"],[data.filter(r=>r.open_score!=null).length,"открытых ответов исправлено вручную"],[avg,"средний балл"],[data.filter(r=>!r.needs&&r.total>=threshold).length,`прошли порог ${threshold}`]]
     .map(([b,s])=>el("div",{class:"stat"}, el("b",{text:String(b)}), el("span",{text:s}))));
   const head=["№","Участник","Группа",...SECTIONS.map(s=>`${s.title.split(". ")[0]} /${s.n*s.each}`),`Откр. /${OPEN_MAX}`,`Итого /${TOTAL}`,"Решение"];
   const t=$("#tbl"); t.replaceChildren(el("tr",{}, ...head.map((h,i)=>el("th",{class:i>=3&&i<head.length-1?"num":"",text:h}))));
   if(!data.length){ t.append(el("tr",{}, el("td",{colspan:head.length,class:"muted",text:"Пока ни одной отправленной работы."}))); return; }
   data.forEach((r,i)=>{
     const sc=r.scores||{};
-    const os=el("input",{type:"number",min:0,max:OPEN_MAX,class:"oscore","aria-label":"Балл за открытый ответ",value:r.open_score??""});
+    const os=el("input",{type:"number",min:0,max:OPEN_MAX,class:"oscore","aria-label":"Балл за открытый ответ",value:r.open_score??"",placeholder:String(r.scores?.O??0),title:"Пусто = автоматический балл"});
     os.addEventListener("change",async()=>{ const v=os.value===""?null:Math.max(0,Math.min(OPEN_MAX,Math.round(Number(os.value))));
       try{ await rpc("olymp_set_open_score",{pin:PIN,rid:r.id,s:v}); r.open_score=v; draw(); }catch(e){ $("#tmsg").textContent="Не удалось сохранить: "+e.message; } });
     const flags=[]; if(r.code) flags.push(`код: ${r.code}`); if(r.leaves) flags.push(`уходил(а) со вкладки: ${r.leaves}`); if(r.auto_submitted) flags.push("отправлено по таймеру");
@@ -339,24 +347,26 @@ function draw(){
     const det=el("details",{}, el("summary",{text:"ответы"}), el("div",{class:"answers"},
       ...SECTIONS.map(s=>el("div",{text:`${s.title}: `+Array.from({length:s.n},(_,j)=>`${j+1}) ${(a[s.id]||[])[j]||"—"}`).join("; ")})),
       el("div",{class:"muted",text:flags.join(" · ")||"замечаний нет"}),
+      el("div",{class:"muted",text:r.scores?.O_info?`Открытый ответ, автоматически: слов ${r.scores.O_info.words}, выгоды ${r.scores.O_info.benefits}, риск ${r.scores.O_info.problem?"есть":"нет"} → ${r.scores.O} из ${OPEN_MAX}`+(r.open_score!=null?`; вручную выставлено ${r.open_score}`:""):""}),
       el("div",{class:"essay",text:a.open||"(открытый ответ пуст)"})));
     const dec = r.needs ? el("span",{class:"pill wait",text:"проверить"}) : el("span",{class:"pill "+(r.total>=threshold?"ok":"bad"),text:r.total>=threshold?"проходит":"не проходит"});
     t.append(el("tr",{}, el("td",{class:"num",text:String(i+1)}), el("td",{}, el("div",{text:`${r.surname} ${r.name}`}),det), el("td",{text:r.grp||""}),
-      ...SECTIONS.map(s=>el("td",{class:"num",text:String(sc[s.id]??0)})), el("td",{class:"num"},os), el("td",{class:"num"},el("b",{text:String(r.total)})), el("td",{},dec)));
+      ...SECTIONS.map(s=>el("td",{class:"num",text:String(sc[s.id]??0)})), el("td",{class:"num"},os, el("div",{class:"muted",style:"font-size:11px",text:r.open_score!=null?"вручную":"авто"})), el("td",{class:"num"},el("b",{text:String(r.total)})), el("td",{},dec)));
   });
 }
 
 function csv(){
   const esc=v=>`"${String(v??"").replace(/"/g,'""')}"`;
   const lines=[["Фамилия","Имя","Группа","Код",...SECTIONS.map(s=>s.title),"Открытый","Итого","Решение","Уходы со вкладки","Отправлено"].map(esc).join(";")];
-  rows.map(r=>({...r,total:(r.auto_score||0)+(r.open_score||0)})).sort((a,b)=>b.total-a.total).forEach(r=>{ const s=r.scores||{};
-    lines.push([r.surname,r.name,r.grp,r.code,...SECTIONS.map(x=>s[x.id]??0),r.open_score??"",r.total,r.total>=threshold?"проходит":"не проходит",r.leaves||0,r.submitted_at?new Date(r.submitted_at).toLocaleString("ru-RU"):""].map(esc).join(";")); });
+  rows.map(r=>({...r,total:totalOf(r)})).sort((a,b)=>b.total-a.total).forEach(r=>{ const s=r.scores||{};
+    lines.push([r.surname,r.name,r.grp,r.code,...SECTIONS.map(x=>s[x.id]??0),openOf(r),r.total,r.total>=threshold?"проходит":"не проходит",r.leaves||0,r.submitted_at?new Date(r.submitted_at).toLocaleString("ru-RU"):""].map(esc).join(";")); });
   const a=el("a",{href:URL.createObjectURL(new Blob(["﻿"+lines.join("\n")],{type:"text/csv"})),download:"olympiad_results.csv"}); document.body.append(a); a.click(); a.remove();
 }
 
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").catch(()=>{});
-if (location.hash === "#teacher") renderTeacherLogin(); else bootStudent();
-addEventListener("hashchange", ()=>location.reload());
+if (location.hash.startsWith("#teacher")) renderTeacherLogin(); else bootStudent();
+const startedAsTeacher = location.hash.startsWith("#teacher");
+addEventListener("hashchange", ()=>{ if (location.hash.startsWith("#teacher=") || location.hash.startsWith("#teacher")!==startedAsTeacher) location.reload(); });
 </script>
 </body>
 </html>

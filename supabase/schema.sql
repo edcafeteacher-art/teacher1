@@ -59,6 +59,28 @@ language sql immutable as $$
   select regexp_replace(replace(replace(lower(trim(coalesce(t,''))), '’', ''''), '‘', ''''), '\s+', ' ', 'g')
 $$;
 
+-- Автоматическая оценка открытого ответа (0–4), прозрачные критерии:
+--   1 балл, если объём 30–80 слов;
+--   до 2 баллов за названные выгоды для экономики (по 1 за каждую разную группу слов);
+--   1 балл, если назван риск или проблема туризма.
+-- Преподаватель может заменить этот балл своим (open_score).
+create or replace function public.olymp_open_score(t text) returns jsonb
+language plpgsql immutable as $$
+declare txt text := lower(coalesce(t,'')); w int; b int := 0; prob boolean; sc int := 0;
+begin
+  w := coalesce(array_length(regexp_split_to_array(nullif(trim(txt),''), '\s+'), 1), 0);
+  if txt ~ '\m(jobs?|employ\w*|work(ers|places?)?|staff|guides?)\M' then b := b + 1; end if;
+  if txt ~ '\m(hotels?|restaurants?|caf[eé]s?|shops?|souvenirs?|business\w*|sell\w*|sales?)\M' then b := b + 1; end if;
+  if txt ~ '\m(money|income|revenues?|tax\w*|profits?|spend\w*|economy|economic|earn\w*|tickets?)\M' then b := b + 1; end if;
+  if txt ~ '\m(transport\w*|bus\w*|trains?|taxis?|roads?|infrastructure|parking)\M' then b := b + 1; end if;
+  prob := txt ~ '\m(pollut\w*|crowd\w*|traffic|litter|rubbish|garbage|noise|nois\w*|damag\w*|destroy\w*|expensive|prices?|queues?|erosion|overtourism|environment\w*|harm\w*|risks?|problems?)\M';
+  if w between 30 and 80 then sc := sc + 1; end if;
+  sc := sc + least(b, 2);
+  if prob then sc := sc + 1; end if;
+  if w < 10 then sc := 0; end if;  -- несколько слов не считаются ответом
+  return jsonb_build_object('O', sc, 'O_info', jsonb_build_object('words', w, 'benefits', b, 'problem', prob));
+end $$;
+
 -- Подсчёт баллов по ключу
 create or replace function public.olymp_score(a jsonb) returns jsonb
 language plpgsql stable security definer set search_path = public as $$
@@ -80,7 +102,7 @@ begin
     s := s || jsonb_build_object(sec, c * p);
     tot := tot + c * p;
   end loop;
-  return s || jsonb_build_object('auto', tot);
+  return s || jsonb_build_object('auto', tot) || olymp_open_score(a ->> 'open');
 end $$;
 
 -- Отправка работы студентом (один раз на фамилию+имя+группу)
@@ -133,3 +155,6 @@ grant execute on function public.olymp_submit(jsonb) to anon;
 grant execute on function public.olymp_get_results(text) to anon;
 grant execute on function public.olymp_set_open_score(text, uuid, int) to anon;
 grant execute on function public.olymp_rescore_all(text) to anon;
+
+-- Пересчитать уже отправленные работы по новым правилам (безопасно запускать повторно):
+update public.olymp_results set scores = public.olymp_score(answers), auto_score = (public.olymp_score(answers)->>'auto')::int;
