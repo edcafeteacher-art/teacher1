@@ -1,0 +1,1123 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Методический аудит курса</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: рабочий стол эксперта. Левая колонка-оглавление аудита, справа рабочая панель; обзор открывается 3D-профилем восьми блоков. */
+:root{
+  --bg:#ECEEF1; --surface:#FFFFFF; --surface-2:#F4F5F7; --sunken:#E3E6EA;
+  --ink:#121519; --muted:#59606D; --faint:#8C93A0; --line:#D5D9E0; --line-strong:#B9BFC9;
+  --accent:#0E6B5C; --accent-ink:#FFFFFF; --accent-soft:#D9EDE8;
+  --mark:#E2A623; --mark-soft:#FBEFCF;
+  --ok:#24805A; --warn:#B9761A; --crit:#B3342B; --nd:#7D8494;
+  --s0:#A8302A; --s1:#C24F2E; --s2:#CB7A22; --s3:#B99A22; --s4:#4C9A69; --s5:#1E7F63;
+  --shadow:0 1px 2px rgba(18,21,25,.06),0 8px 24px -12px rgba(18,21,25,.18);
+  --f-display:"Unbounded","Golos Text",system-ui,sans-serif;
+  --f-body:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C0F12; --surface:#141920; --surface-2:#1A2028; --sunken:#0F1318;
+  --ink:#E6E9ED; --muted:#9AA2AF; --faint:#6B7380; --line:#27303A; --line-strong:#3A4552;
+  --accent:#3DBFA6; --accent-ink:#06231D; --accent-soft:#12332D;
+  --mark:#F0BA45; --mark-soft:#3A2F14;
+  --ok:#4CC08A; --warn:#E3A043; --crit:#F06A5C; --nd:#8A92A1;
+  --s0:#E2594D; --s1:#E5774F; --s2:#E59A45; --s3:#D9BE4A; --s4:#5FBF86; --s5:#3DBFA6;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0C0F12; --surface:#141920; --surface-2:#1A2028; --sunken:#0F1318;
+  --ink:#E6E9ED; --muted:#9AA2AF; --faint:#6B7380; --line:#27303A; --line-strong:#3A4552;
+  --accent:#3DBFA6; --accent-ink:#06231D; --accent-soft:#12332D;
+  --mark:#F0BA45; --mark-soft:#3A2F14;
+  --ok:#4CC08A; --warn:#E3A043; --crit:#F06A5C; --nd:#8A92A1;
+  --s0:#E2594D; --s1:#E5774F; --s2:#E59A45; --s3:#D9BE4A; --s4:#5FBF86; --s5:#3DBFA6;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--f-body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--surface)}
+h1,h2,h3{font-family:var(--f-display);font-weight:500;letter-spacing:-.01em;text-wrap:balance;margin:0}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--mark);outline-offset:2px;border-radius:6px}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.top-in{display:flex;align-items:center;gap:16px;min-height:58px;padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand-mark{width:30px;height:30px;flex:none}
+.brand b{font-family:var(--f-display);font-weight:500;font-size:14px;white-space:nowrap}
+.brand span{display:block;font-size:11px;color:var(--muted);font-family:var(--f-mono);letter-spacing:.06em}
+.top-prog{flex:1;display:flex;align-items:center;gap:10px;min-width:0;justify-content:flex-end}
+.meter{width:min(220px,30vw);height:6px;border-radius:9px;background:var(--sunken);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--accent);border-radius:9px;transition:width .4s}
+a{color:var(--accent)}
+.btn{color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:7px 12px;cursor:pointer;font-size:13.5px;font-weight:500;transition:background .15s,border-color .15s,transform .1s;white-space:nowrap}
+.btn:hover{background:var(--surface-2);border-color:var(--ink)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn.ghost:hover{background:var(--surface-2);border-color:var(--line)}
+.btn.danger{color:var(--crit);border-color:color-mix(in srgb,var(--crit) 45%,transparent)}
+.btn.sm{padding:4px 9px;font-size:12.5px}
+
+/* shell */
+.shell{display:grid;grid-template-columns:250px minmax(0,1fr);gap:28px;max-width:1440px;margin:0 auto;padding-block:24px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+nav.rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 78px);align-self:start;display:flex;flex-direction:column;gap:18px;max-height:calc(100vh - 100px);overflow:auto;padding-right:4px}
+.rail-group{display:flex;flex-direction:column;gap:2px}
+.rail-group>.eyebrow{padding:0 10px 6px}
+.rail a{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;text-decoration:none;color:var(--muted);font-size:14px;line-height:1.3}
+.rail a:hover{background:var(--surface);color:var(--ink)}
+.rail a.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow);font-weight:500}
+.rail a .n{font-family:var(--f-mono);font-size:11px;width:20px;color:var(--faint)}
+.rail a .t{flex:1;min-width:0}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--line-strong);flex:none}
+.dot.part{background:var(--mark)}
+.dot.done{background:var(--ok)}
+.dot.warn{background:var(--crit)}
+.rail .sc{font-family:var(--f-mono);font-size:11px;padding:1px 6px;border-radius:5px;background:var(--surface-2);color:var(--muted)}
+
+main{min-width:0}
+.panel{display:flex;flex-direction:column;gap:22px;animation:rise .35s ease both}
+@keyframes rise{from{opacity:.0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.panel{animation:none}*{transition:none!important}}
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px}
+.head h2{font-size:clamp(22px,2.4vw,30px);line-height:1.15}
+.head p{color:var(--muted);max-width:70ch;margin-top:6px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.card.flat{box-shadow:none}
+.card h3{font-size:15px;font-weight:500;margin-bottom:12px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.stack{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.note{font-size:13px;color:var(--muted)}
+.note.box{background:var(--surface-2);border:1px dashed var(--line-strong);border-radius:8px;padding:10px 12px}
+
+label.f{display:flex;flex-direction:column;gap:5px;min-width:0}
+label.f>span{font-size:12.5px;color:var(--muted);font-weight:500}
+label.f>span em{font-style:normal;color:var(--crit)}
+input[type=text],select,textarea{width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:14.5px;transition:border-color .15s,background .15s}
+textarea{resize:vertical;min-height:72px;line-height:1.5}
+input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);background:var(--surface)}
+input::placeholder,textarea::placeholder{color:var(--faint)}
+textarea.need{border-color:color-mix(in srgb,var(--crit) 60%,var(--line))}
+
+/* example banner */
+.banner{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;background:var(--mark-soft);border:1px solid color-mix(in srgb,var(--mark) 55%,transparent);border-radius:var(--r);padding:12px 16px;font-size:14px}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+.hero-l{padding:28px;display:flex;flex-direction:column;gap:18px;border-right:1px solid var(--line);min-width:0}
+.hero-l h1{font-size:clamp(24px,3vw,38px);line-height:1.1;font-weight:500}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;padding:3px 9px;border-radius:99px;border:1px solid var(--line);background:var(--surface-2);color:var(--muted)}
+.chip.empty{border-style:dashed;color:var(--faint)}
+.index{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.index .big{font-family:var(--f-display);font-size:clamp(46px,6vw,72px);line-height:.9;font-weight:500;letter-spacing:-.03em}
+.index .big small{font-size:.38em;color:var(--faint);font-weight:400}
+.index .cap{font-size:13px;color:var(--muted);max-width:28ch}
+.pill{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:500;padding:5px 11px;border-radius:99px;border:1px solid currentColor}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.pill.ok{color:var(--ok)}.pill.warn{color:var(--warn)}.pill.crit{color:var(--crit)}.pill.nd{color:var(--nd)}
+.hero-r{position:relative;min-height:420px;background:
+  radial-gradient(120% 90% at 50% 100%,color-mix(in srgb,var(--accent) 16%,transparent),transparent 60%),var(--surface-2)}
+#stage{position:absolute;inset:0;cursor:grab;touch-action:pan-y;overflow:hidden}
+#stage.drag{cursor:grabbing}
+#stage canvas{display:block;width:100%!important;height:100%!important}
+.lbl{position:absolute;transform:translate(-50%,-100%);pointer-events:none;font-family:var(--f-mono);font-size:11px;white-space:nowrap;text-align:center;color:var(--ink);text-shadow:0 1px 0 var(--surface-2)}
+.lbl b{display:block;font-family:var(--f-display);font-size:15px;font-weight:500}
+.lbl{font-size:10px;color:var(--muted)}
+.lbl.hl{color:var(--accent)}
+.stage-cap{position:absolute;left:16px;right:16px;bottom:12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);pointer-events:none}
+.legend{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+.tip{position:absolute;top:14px;left:14px;max-width:260px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 11px;font-size:12.5px;box-shadow:var(--shadow);pointer-events:none}
+.fallback{position:absolute;inset:0;display:grid;place-items:center;padding:20px}
+
+/* chain */
+.chain{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;align-items:stretch}
+.link{position:relative;padding:14px 16px;border:1px solid var(--line);background:var(--surface);min-width:0}
+.link:first-child{border-radius:10px 0 0 10px}
+.link:last-child{border-radius:0 10px 10px 0}
+.link+.link{border-left:none}
+.link:not(:last-child)::after{content:"";position:absolute;right:-8px;top:50%;width:14px;height:14px;background:var(--surface);border-top:1px solid var(--line);border-right:1px solid var(--line);transform:translateY(-50%) rotate(45deg);z-index:1}
+.link .k{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.link .v{font-family:var(--f-display);font-size:22px;margin-top:4px}
+.link .v small{font-size:13px;color:var(--faint)}
+.bar{height:4px;border-radius:9px;background:var(--sunken);margin-top:8px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:9px}
+
+/* tiles */
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;perspective:900px}
+.tile{position:relative;display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:12px;background:var(--surface);border:1px solid var(--line);text-decoration:none;color:inherit;transform:rotateX(var(--rx,0)) rotateY(var(--ry,0));transition:transform .25s ease,box-shadow .25s,border-color .2s;transform-style:preserve-3d;min-width:0}
+.tile:hover{box-shadow:var(--shadow);border-color:var(--line-strong)}
+.tile .top-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.tile .num{font-family:var(--f-mono);font-size:11px;color:var(--faint)}
+.tile h4{margin:0;font-size:14px;font-weight:500;line-height:1.3}
+.tile .meta{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;gap:6px}
+.score{display:inline-grid;place-items:center;min-width:38px;height:30px;padding:0 8px;border-radius:7px;font-family:var(--f-display);font-size:15px;font-weight:500;background:var(--surface-2);color:var(--faint);border:1px dashed var(--line-strong)}
+.score.v0{background:var(--s0);color:#fff;border:none}.score.v1{background:var(--s1);color:#fff;border:none}.score.v2{background:var(--s2);color:#fff;border:none}
+.score.v3{background:var(--s3);color:#1b1600;border:none}.score.v4{background:var(--s4);color:#fff;border:none}.score.v5{background:var(--s5);color:#fff;border:none}
+.score.nd{background:transparent;color:var(--nd);border:1px solid var(--nd);font-family:var(--f-mono);font-size:12px}
+
+/* checks */
+.checks{display:flex;flex-direction:column;gap:6px}
+.check{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border-radius:8px;background:var(--surface-2);font-size:13.5px;text-decoration:none;color:inherit;border-left:3px solid var(--line-strong)}
+.check.err{border-left-color:var(--crit)}
+.check.wrn{border-left-color:var(--warn)}
+.check.inf{border-left-color:var(--nd)}
+.check .lvl{font-family:var(--f-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;flex:none;width:68px;padding-top:2px}
+.check.err .lvl{color:var(--crit)}.check.wrn .lvl{color:var(--warn)}.check.inf .lvl{color:var(--nd)}
+a.check:hover{background:var(--sunken)}
+
+/* block questions */
+.q{display:grid;grid-template-columns:28px minmax(0,1fr);gap:4px 12px;padding:14px 0;border-top:1px solid var(--line)}
+.q:first-child{border-top:none;padding-top:0}
+.q .i{font-family:var(--f-mono);font-size:12px;color:var(--faint);padding-top:2px}
+.q .txt{font-size:14.5px}
+.q .ctl{grid-column:2;display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:6px}
+.q .ctl input{flex:1;min-width:200px;padding:6px 10px;font-size:13.5px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface-2);flex-wrap:wrap}
+.seg button{border:none;background:transparent;padding:5px 10px;font-size:12.5px;cursor:pointer;color:var(--muted);border-right:1px solid var(--line)}
+.seg button:last-child{border-right:none}
+.seg button:hover{color:var(--ink);background:var(--sunken)}
+.seg button.on{color:var(--ink);background:var(--surface);font-weight:600;box-shadow:inset 0 -2px 0 var(--accent)}
+.seg button.on[data-v="no"]{box-shadow:inset 0 -2px 0 var(--crit)}
+.seg button.on[data-v="part"]{box-shadow:inset 0 -2px 0 var(--mark)}
+.seg button.on[data-v="na"]{box-shadow:inset 0 -2px 0 var(--nd)}
+.scale{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.scale button{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);cursor:pointer;text-align:left;min-width:0;transition:transform .15s,border-color .15s}
+.scale button:hover{border-color:var(--line-strong);transform:translateY(-2px)}
+.scale button b{font-family:var(--f-display);font-size:22px;font-weight:500;line-height:1}
+.scale button span{font-size:11.5px;color:var(--muted);line-height:1.3}
+.scale button.on{border-color:var(--ink);background:var(--surface);box-shadow:var(--shadow)}
+.scale button.on b{color:var(--accent)}
+.focus{border-left:3px solid var(--mark);padding:2px 0 2px 14px;color:var(--muted);font-size:14px;max-width:80ch}
+.hours{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.stackbar{display:flex;height:26px;border-radius:7px;overflow:hidden;background:var(--sunken);margin-top:6px}
+.stackbar div{display:grid;place-items:center;font-size:11px;font-family:var(--f-mono);color:#fff;min-width:0;overflow:hidden;white-space:nowrap}
+
+/* lists of records */
+.rec{display:grid;gap:10px;padding:16px;border:1px solid var(--line);border-radius:10px;background:var(--surface);position:relative}
+.rec .rec-h{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.rec .rec-h .eyebrow{color:var(--faint)}
+.prio{font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:5px}
+.prio.p1{background:var(--crit);color:#fff}.prio.p2{background:var(--warn);color:#fff}.prio.p3{background:var(--mark-soft);color:var(--ink)}.prio.p4{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+.rec[data-p="Критический"]{border-left:4px solid var(--crit)}
+.rec[data-p="Высокий"]{border-left:4px solid var(--warn)}
+.rec[data-p="Средний"]{border-left:4px solid var(--mark)}
+.rec[data-p="Низкий"]{border-left:4px solid var(--line-strong)}
+.gaps{display:flex;flex-wrap:wrap;gap:6px}
+.gap{font-size:12px;padding:2px 8px;border-radius:5px;background:color-mix(in srgb,var(--crit) 14%,transparent);color:var(--crit)}
+.gap.okk{background:color-mix(in srgb,var(--ok) 14%,transparent);color:var(--ok)}
+.cols3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start}
+.col h3{display:flex;justify-content:space-between;align-items:center}
+.item{display:flex;gap:8px;align-items:flex-start}
+.item textarea{min-height:56px}
+.x{border:none;background:transparent;color:var(--faint);cursor:pointer;font-size:18px;line-height:1;padding:4px 6px;border-radius:6px}
+.x:hover{color:var(--crit);background:var(--surface-2)}
+
+/* outcomes analyzer */
+.lo{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 14px;padding:12px 14px;border-radius:9px;background:var(--surface-2);border-left:3px solid var(--line-strong)}
+.lo.bad{border-left-color:var(--crit)}.lo.good{border-left-color:var(--ok)}.lo.mid{border-left-color:var(--mark)}
+.lo .s{font-size:12.5px;color:var(--muted);grid-column:1/-1}
+.lo mark{background:var(--mark-soft);color:var(--ink);padding:0 3px;border-radius:3px}
+.verbs{display:flex;flex-wrap:wrap;gap:6px}
+.verbs button{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:3px 10px;font-size:12.5px;cursor:pointer}
+.verbs button:hover{border-color:var(--accent);color:var(--accent)}
+.bloom{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.bloom div{padding:10px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line);min-width:0}
+.bloom b{display:block;font-size:12.5px;margin-bottom:4px}
+.bloom span{font-size:12px;color:var(--muted)}
+
+/* report */
+.report{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:clamp(18px,4vw,44px);max-width:960px}
+.report h1{font-size:26px;margin-bottom:6px}
+.report h2{font-size:18px;margin:30px 0 10px;padding-top:18px;border-top:1px solid var(--line)}
+.report h3{font-family:var(--f-body);font-size:15px;font-weight:600;margin:16px 0 6px}
+.report p,.report li{font-size:14.5px;max-width:75ch}
+.report p+p{margin-top:8px}
+.report ul{margin:6px 0;padding-left:20px}
+.tw{overflow-x:auto;margin:8px 0}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--surface-2);font-weight:600;font-size:12.5px}
+td.c{text-align:center;font-family:var(--f-mono)}
+.empty-v{color:var(--faint);font-style:italic}
+pre.prompt{white-space:pre-wrap;word-break:break-word;font-family:var(--f-mono);font-size:12.5px;line-height:1.6;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:18px;max-height:640px;overflow:auto;margin:0}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:9px;font-size:13.5px;opacity:0;pointer-events:none;transition:.25s;z-index:50}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.pager{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.confirm{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:color-mix(in srgb,var(--crit) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--crit) 40%,transparent);border-radius:9px;padding:10px 14px;font-size:14px}
+.radar svg{max-width:100%;height:auto;display:block}
+.file{font-size:13px}
+
+@media (max-width:1100px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.scale{grid-template-columns:repeat(4,minmax(0,1fr))}.bloom{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:900px){
+  .shell{grid-template-columns:minmax(0,1fr);gap:16px;padding-top:12px}
+  nav.rail{position:static;flex-direction:row;overflow-x:auto;max-height:none;gap:6px;padding-bottom:6px;scrollbar-width:thin}
+  .rail-group{flex-direction:row;gap:4px}
+  .rail-group>.eyebrow{display:none}
+  .rail a{white-space:nowrap;padding:6px 10px;background:var(--surface);border:1px solid var(--line)}
+  .rail a .n{display:none}
+  .hero{grid-template-columns:minmax(0,1fr)}
+  .hero-l{border-right:none;border-bottom:1px solid var(--line)}
+  .hero-r{min-height:360px}
+  .grid2,.grid3,.cols3,.hours{grid-template-columns:minmax(0,1fr)}
+  .chain{grid-template-columns:minmax(0,1fr)}
+  .link,.link:first-child,.link:last-child{border-radius:0;border-left:1px solid var(--line)}
+  .link:first-child{border-radius:10px 10px 0 0}.link:last-child{border-radius:0 0 10px 10px}
+  .link+.link{border-top:none}
+  .link:not(:last-child)::after{right:auto;left:50%;top:auto;bottom:-8px;transform:translateX(-50%) rotate(135deg)}
+  .brand span,.top-prog .mono{display:none}
+}
+@media (max-width:520px){.tiles{grid-template-columns:minmax(0,1fr)}.scale{grid-template-columns:repeat(3,minmax(0,1fr))}.bloom{grid-template-columns:repeat(2,minmax(0,1fr))}.hero-l{padding:20px}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="1" y="1" width="30" height="30" rx="8" fill="var(--accent)"/>
+        <rect x="7" y="17" width="3" height="8" rx="1" fill="var(--accent-ink)"/>
+        <rect x="12" y="12" width="3" height="13" rx="1" fill="var(--accent-ink)"/>
+        <rect x="17" y="15" width="3" height="10" rx="1" fill="var(--accent-ink)"/>
+        <rect x="22" y="8" width="3" height="17" rx="1" fill="var(--mark)"/>
+      </svg>
+      <div><b>Методический аудит курса</b><span>8 НАПРАВЛЕНИЙ · ШКАЛА 0–5 · Н/Д</span></div>
+    </div>
+    <div class="top-prog">
+      <span class="mono note" id="progTxt">0%</span>
+      <div class="meter" title="Заполненность экспертизы"><i id="progBar" style="width:0"></i></div>
+      <a class="btn sm" href="#report">Отчёт</a>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="rail" id="rail" aria-label="Разделы аудита"></nav>
+  <main id="main"></main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+"use strict";
+/* ---------- справочные данные ---------- */
+const BLOCKS=[
+ {id:1,title:"Цели и результаты обучения",short:"Цели и результаты",
+  focus:"Выяви расплывчатые, декларативные и неизмеримые формулировки. Предложи улучшенные формулировки через наблюдаемые действия.",
+  q:["Насколько чётко сформулированы цели курса?","Соответствуют ли цели потребностям целевой аудитории?","Определены ли конкретные результаты обучения?","Можно ли проверить достижение каждого результата?","Соответствуют ли результаты уровню подготовки и продолжительности курса?","Есть ли связь с профессиональными или образовательными задачами обучающихся?"]},
+ {id:2,title:"Структура и логика курса",short:"Структура и логика",
+  focus:"Определи, какие темы переставить, объединить, разделить, сократить или дополнить. Проверь, формирует ли структура целостное понимание предмета, а не набор разрозненных тем.",
+  q:["Последовательность модулей и тем обоснована","Есть переход от базовых знаний к сложным","Между разделами прослеживаются логические связи","Учтены необходимые предварительные знания","Отсутствуют повторы и дублирование содержания","Нет необоснованных пропусков","Объём содержания соответствует времени обучения"]},
+ {id:3,title:"Баланс теории и практики",short:"Теория и практика",
+  focus:"Не оценивай баланс только по количеству часов или заданий. Проверь, позволяет ли практика действительно сформировать заявленные умения. Проценты рассчитываются только по фактическим данным.",
+  q:["Соотношение теоретических и практических занятий обосновано","Практическое применение следует за изучением ключевых понятий","Задания связаны с профессиональными или жизненными ситуациями","Практические задачи постепенно усложняются","Самостоятельной работы достаточно","Есть возможность переноса знаний в новые ситуации"]},
+ {id:4,title:"Задания и учебная деятельность",short:"Задания",
+  focus:"Определи задания, которые недостаточно эффективны, повторяются или не имеют очевидной учебной цели. Новые задания описывай через цель, условия, ожидаемый результат и проверяемое умение.",
+  q:["Задания соответствуют результатам обучения","Формы учебной деятельности разнообразны","Уровень сложности соответствует аудитории","Есть индивидуальные и групповые задания","Есть проблемные, исследовательские и практико-ориентированные задачи","Есть возможность самостоятельного принятия решений","Есть задания на анализ, аргументацию и применение знаний"]},
+ {id:5,title:"Оценивание и обратная связь",short:"Оценивание",
+  focus:"Проверь, не подменяется ли оценка практических компетенций проверкой теоретических знаний.",
+  q:["Контрольные мероприятия соответствуют результатам обучения","Предусмотрен входной, текущий и итоговый контроль","Оценочные средства разнообразны","Критерии оценивания понятны","Практические умения можно оценить объективно","Обратная связь качественная и своевременная","Есть возможность исправить ошибки и выполнить задание повторно"]},
+ {id:6,title:"Учебные материалы и ресурсы",short:"Материалы",
+  focus:"Выяви, каких материалов не хватает для полноценного освоения программы. Не предлагай ресурсы только ради увеличения их количества.",
+  q:["Учебных материалов достаточно","Материалы соответствуют уровню аудитории","Информация актуальна","Есть практические примеры","Объяснения доступны и понятны","Есть дополнительные источники и инструменты","Ресурсы соответствуют содержанию и целям курса"]},
+ {id:7,title:"Профессиональная и практическая ценность",short:"Практическая ценность",
+  focus:"Не приписывай курсу результаты, которые не подтверждаются его содержанием.",
+  q:["Понятно, какие знания и умения студент сможет использовать после обучения","Содержание приближено к реальным профессиональным задачам","Есть связь теории и практики профессиональной деятельности","Формируются самостоятельность, аналитическое мышление, способность принимать решения","Определены элементы, требующие обновления с учётом изменений профессиональной среды"]},
+ {id:8,title:"Целостность и методическая согласованность",short:"Согласованность",
+  focus:"Сквозная проверка ЦЕЛЬ → РЕЗУЛЬТАТ → ТЕМА → ДЕЯТЕЛЬНОСТЬ → ОЦЕНИВАНИЕ. Для каждого результата заполни строку матрицы согласованности.",
+  q:["Для каждого результата известно, где он формируется","Для каждого результата есть задания, помогающие его достичь","Для каждого результата определён способ проверки","Учебного времени достаточно для освоения каждого результата"]}
+];
+const SCALE={0:"Элемент отсутствует или не выполняет функцию",1:"Критически недостаточный уровень",2:"Существенные недостатки",3:"Приемлемо, нужны улучшения",4:"Хороший уровень, отдельные недочёты",5:"Высокий уровень, методически обосновано",nd:"Информации недостаточно для оценки"};
+const QS=[["yes","Да"],["part","Частично"],["no","Нет"],["na","Нет данных"]];
+const PRIOS=["Критический","Высокий","Средний","Низкий"];
+const PRIO_DESC={"Критический":"мешает достижению целей курса","Высокий":"существенно снижает качество обучения","Средний":"требует планового улучшения","Низкий":"желательное усовершенствование"};
+const STATES=["","Можно использовать в текущем виде","Требует точечной доработки","Требует существенной переработки","Не обеспечивает заявленные результаты"];
+const DOC_KINDS=["Программа","Учебный план","Рабочая программа","Тематический план","Методические материалы","Задания","Оценочные средства","Другое"];
+const BLOOM=[
+ {lvl:"Запоминание",v:["перечислять","называть","воспроизводить","определять","узнавать"]},
+ {lvl:"Понимание",v:["объяснять","интерпретировать","классифицировать","приводить примеры","обобщать"]},
+ {lvl:"Применение",v:["применять","рассчитывать","выполнять","использовать","решать"]},
+ {lvl:"Анализ",v:["анализировать","сравнивать","различать","выявлять","структурировать"]},
+ {lvl:"Оценка",v:["оценивать","аргументировать","обосновывать","критиковать","проверять"]},
+ {lvl:"Создание",v:["разрабатывать","проектировать","составлять","планировать","формулировать"]}
+];
+const VAGUE=[
+ {re:/(^|[^а-яё])(знать|знание|знания|знаний)(?=[^а-яё]|$)/i,why:"«знать» не описывает наблюдаемое действие"},
+ {re:/(^|[^а-яё])(понимать|понимание|понимания)(?=[^а-яё]|$)/i,why:"«понимать» нельзя проверить напрямую"},
+ {re:/(^|[^а-яё])(владеть|владение|владения)(?=[^а-яё]|$)/i,why:"«владеть» не задаёт уровень и способ проверки"},
+ {re:/ознаком/i,why:"«ознакомиться» описывает процесс, а не результат"},
+ {re:/иметь представлени/i,why:"«иметь представление» неизмеримо"},
+ {re:/(^|[^а-яё])(изучить|изучение)(?=[^а-яё]|$)/i,why:"«изучить» описывает деятельность преподавателя или процесс"},
+ {re:/(^|[^а-яё])(освоить|освоение)(?=[^а-яё]|$)/i,why:"«освоить» не указывает, что именно делает обучающийся"},
+ {re:/(^|[^а-яё])(осознавать|осознание|усвоить|усвоение)(?=[^а-яё]|$)/i,why:"внутреннее состояние нельзя наблюдать"},
+ {re:/(^|[^а-яё])(сформировать|формирование|развить|развитие)(?=[^а-яё]|$)/i,why:"формулировка цели преподавателя, а не результата обучающегося"}
+];
+
+/* ---------- состояние ---------- */
+const KEY="course-audit-v1";
+const uid=()=>Math.random().toString(36).slice(2,9);
+function blank(){
+  const blocks={};
+  BLOCKS.forEach(b=>{blocks[b.id]={q:b.q.map(()=>({s:"",n:""})),score:null,evidence:"",source:"",remarks:"",recs:""}});
+  blocks[3].hours={theory:"",practice:"",self:"",control:""};
+  return {isExample:false,passport:{name:"",type:"",audience:"",level:"",duration:"",format:"",purpose:""},
+    docs:[],blocks,problems:[],matrix:[],tasks:[],plan:{must:[],want:[],extra:[]},structure:[],
+    verdict:{summary:"",strengths:"",problems:"",state:""},final:{q1:"",q2:"",q3:"",q4:"",q5:""},loDraft:""};
+}
+function example(){
+  const s=blank(); s.isExample=true;
+  Object.assign(s.passport,{name:"Основы финансовой грамотности (пример)",type:"СПО",audience:"Студенты 1 курса, специальность «Банковское дело»",level:"Начальный",duration:"36 академических часов, 1 семестр",format:"Очный",purpose:"Переработка"});
+  s.docs=[
+   {id:uid(),name:"Рабочая программа дисциплины",kind:"Рабочая программа",purpose:"Цели, результаты, содержание, распределение часов",relation:"Основной документ, на него ссылаются КТП и ФОС",text:""},
+   {id:uid(),name:"Календарно-тематический план",kind:"Тематический план",purpose:"Последовательность 18 занятий",relation:"Детализирует раздел 2 рабочей программы",text:""},
+   {id:uid(),name:"Фонд оценочных средств",kind:"Оценочные средства",purpose:"Тест, 2 контрольные работы, зачёт",relation:"Должен проверять результаты из раздела 1.3 РП",text:""}];
+  const b=s.blocks;
+  const fill=(id,arr)=>arr.forEach((v,i)=>{b[id].q[i].s=v});
+  fill(1,["part","yes","part","no","part","yes"]); b[1].score=2;
+  b[1].evidence="РП, раздел 1.3. Из 7 результатов 5 сформулированы через «знать» и «понимать», критерии достижения не указаны.";
+  b[1].source="Рабочая программа, п. 1.3"; b[1].remarks="Цели соответствуют аудитории, но результаты декларативны.";
+  b[1].recs="Переформулировать результаты через наблюдаемые действия (рассчитывать, сравнивать, обосновывать).";
+  b[1].q[3].n="Нет критериев для 5 из 7 результатов";
+  fill(2,["yes","yes","part","yes","no","yes","part"]); b[2].score=3;
+  b[2].evidence="КТП, занятия 7 и 12 дублируют тему «Кредит и заём». Последовательность от бюджета к инвестициям выдержана.";
+  b[2].source="КТП, занятия 7, 12";
+  fill(3,["part","no","part","no","part","no"]); b[3].score=2; Object.assign(b[3].hours,{theory:"22",practice:"10",self:"0",control:"4"});
+  b[3].evidence="РП, раздел 2. Практические занятия сосредоточены в конце семестра, после 8 лекционных занятий подряд.";
+  b[3].source="Рабочая программа, раздел 2";
+  fill(4,["part","part","yes","no","no","part","part"]); b[4].score=3;
+  b[4].evidence="Методические материалы содержат 6 заданий, из них 4 репродуктивные (ответы на вопросы по тексту).";
+  fill(5,["no","part","no","no","no","na","na"]); b[5].score=1;
+  b[5].evidence="ФОС включает только тест на знание терминов. Умение «составлять личный бюджет» из п. 1.3 РП не проверяется.";
+  b[5].source="ФОС, разделы 1–3";
+  b[6].score="nd"; b[6].evidence="Учебные материалы не предоставлены, есть только перечень литературы в РП.";
+  fill(7,["part","part","part","no","na"]); b[7].score=3; b[7].evidence="Темы связаны с банковской практикой, но кейсов из реальной работы нет.";
+  s.problems=[
+   {id:uid(),problem:"Практическое умение «составлять личный бюджет» не проверяется",where:"ФОС; РП, п. 1.3",effect:"Невозможно подтвердить достижение ключевого результата",priority:"Критический",rec:"Добавить практическое задание с рубрикой на 4 критерия"},
+   {id:uid(),problem:"Результаты обучения сформулированы через «знать» и «понимать»",where:"РП, п. 1.3",effect:"Нельзя построить измеримые критерии оценивания",priority:"Высокий",rec:"Переформулировать результаты через наблюдаемые действия"},
+   {id:uid(),problem:"Дублирование темы «Кредит и заём»",where:"КТП, занятия 7 и 12",effect:"Потеря 2 часов, которых не хватает на практику",priority:"Средний",rec:"Объединить занятия, высвободившиеся часы отдать на практикум"}];
+  s.matrix=[
+   {id:uid(),lo:"Составлять личный бюджет на месяц",topics:"Тема 2. Личный бюджет",tasks:"Практическая работа № 1",assess:"",time:"Недостаточно",gap:""},
+   {id:uid(),lo:"Сравнивать условия банковских вкладов",topics:"Тема 4. Сбережения",tasks:"",assess:"Тест, вопросы 11–15",time:"Нет данных",gap:"Тест проверяет термины, а не сравнение"},
+   {id:uid(),lo:"Рассчитывать полную стоимость кредита",topics:"Тема 5. Кредит",tasks:"Задача на расчёт ПСК",assess:"Контрольная работа № 2",time:"Достаточно",gap:""}];
+  s.tasks=[{id:uid(),goal:"Научить сравнивать вклады по реальным условиям",cond:"Пары, 30 минут, условия трёх вкладов из открытых источников",result:"Таблица сравнения и аргументированный выбор",skill:"Сравнивать условия банковских вкладов"}];
+  s.plan.must=[{id:uid(),t:"Добавить в ФОС практическое задание с рубрикой для проверки умения составлять бюджет"}];
+  s.plan.want=[{id:uid(),t:"Перенести практикумы ближе к соответствующим лекциям"}];
+  s.loDraft="Знать основные виды банковских вкладов\nПонимать принципы кредитования\nРассчитывать полную стоимость кредита по заданным условиям\nОзнакомиться с правами потребителя финансовых услуг";
+  return s;
+}
+function merge(base,src){ // аккуратное восстановление сохранённых данных
+  if(!src||typeof src!=="object")return base;
+  for(const k in base){
+    if(!(k in src))continue;
+    if(base[k]&&typeof base[k]==="object"&&!Array.isArray(base[k])&&src[k]&&typeof src[k]==="object"&&!Array.isArray(src[k]))merge(base[k],src[k]);
+    else base[k]=src[k];
+  }
+  return base;
+}
+function load(){try{const r=localStorage.getItem(KEY);if(r)return merge(blank(),JSON.parse(r))}catch(e){}return null}
+let S=load()||example();
+let saveT=null;
+function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}},250);derived()}
+
+/* ---------- утилиты ---------- */
+const $=s=>document.querySelector(s);
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const filled=v=>String(v??"").trim().length>0;
+const fmt=n=>n.toFixed(1).replace(".",",");
+function toast(t){const el=$("#toast");el.textContent=t;el.classList.add("show");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),2200)}
+function getPath(p){return p.split(".").reduce((o,k)=>o==null?o:o[k],S)}
+function setPath(p,v){const k=p.split(".");let o=S;for(let i=0;i<k.length-1;i++)o=o[k[i]];o[k[k.length-1]]=v}
+function findById(list,id){return list.findIndex(x=>x.id===id)}
+async function copy(text,ok){
+  try{await navigator.clipboard.writeText(text);toast(ok||"Скопировано")}
+  catch(e){const ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();
+    let done=false;try{done=document.execCommand("copy")}catch(_){}ta.remove();
+    toast(done?(ok||"Скопировано"):"Браузер запретил копирование. Выделите текст вручную")}
+}
+function scoreCls(v){return v==="nd"?"nd":(v===null||v===undefined||v==="")?"":"v"+v}
+function scoreTxt(v){return v==="nd"?"Н/Д":(v===null||v===undefined||v==="")?"·":String(v)}
+
+/* ---------- вычисления ---------- */
+function blockStat(id){
+  const b=S.blocks[id];const ans=b.q.filter(x=>x.s).length;
+  const numeric=typeof b.score==="number";
+  const evOk=b.score===null||filled(b.evidence);
+  return {ans,total:b.q.length,score:b.score,numeric,evOk};
+}
+function overall(){
+  const vals=[],nd=[],none=[];
+  BLOCKS.forEach(b=>{const v=S.blocks[b.id].score;if(typeof v==="number")vals.push(v);else if(v==="nd")nd.push(b.id);else none.push(b.id)});
+  const avg=vals.length?vals.reduce((a,c)=>a+c,0)/vals.length:null;
+  return {avg,n:vals.length,nd,none,min:vals.length?Math.min(...vals):null};
+}
+function matrixGaps(r){
+  const g=[];if(!filled(r.topics))g.push("нет темы");if(!filled(r.tasks))g.push("нет задания");if(!filled(r.assess))g.push("нет способа оценки");
+  if(r.time==="Недостаточно")g.push("недостаточно времени");return g;
+}
+function chain(){
+  const rows=S.matrix.filter(r=>filled(r.lo));const n=rows.length;
+  return {n,goal:filled(S.verdict.summary)||filled(S.passport.purpose)?1:0,
+    topics:rows.filter(r=>filled(r.topics)).length,tasks:rows.filter(r=>filled(r.tasks)).length,assess:rows.filter(r=>filled(r.assess)).length};
+}
+function checks(){
+  const out=[];const P=S.passport;
+  const pl={name:"название курса",type:"тип программы",audience:"целевая аудитория",level:"уровень подготовки",duration:"продолжительность",format:"формат",purpose:"назначение аудита"};
+  const miss=Object.keys(pl).filter(k=>!filled(P[k]));
+  if(miss.length)out.push({l:"wrn",t:"В паспорте не указано "+miss.map(k=>pl[k]).join(", ")+". Выводы, зависящие от этих данных, ограничены.",go:"passport"});
+  if(!S.docs.length)out.push({l:"err",t:"Не добавлено ни одного документа. Аудит без материалов невозможен, оценки будут ничем не подтверждены.",go:"docs"});
+  S.docs.forEach(d=>{if(!filled(d.purpose)||!filled(d.relation))out.push({l:"wrn",t:"Для документа «"+(d.name||"без названия")+"» не установлено назначение или связь с другими документами.",go:"docs"})});
+  BLOCKS.forEach(b=>{const B=S.blocks[b.id];
+    if(typeof B.score==="number"&&!filled(B.evidence))out.push({l:"err",t:"Блок "+b.id+". Балл "+B.score+" поставлен без доказательства из материалов.",go:"block-"+b.id});
+    if(B.score==="nd"&&!filled(B.evidence))out.push({l:"wrn",t:"Блок "+b.id+". Отметка Н/Д без указания, каких данных не хватает.",go:"block-"+b.id});
+    if(B.score===null)out.push({l:"inf",t:"Блок "+b.id+" «"+b.short+"» пока не оценён.",go:"block-"+b.id});
+    if(typeof B.score==="number"&&B.score>=4&&B.q.some(x=>x.s==="no"))out.push({l:"wrn",t:"Блок "+b.id+". Высокий балл при ответах «Нет» в контрольных вопросах. Проверьте согласованность оценки.",go:"block-"+b.id});
+    if(typeof B.score==="number"&&B.score<=1&&B.q.length&&B.q.every(x=>x.s==="yes"))out.push({l:"wrn",t:"Блок "+b.id+". Низкий балл при положительных ответах на все вопросы.",go:"block-"+b.id});
+  });
+  const o=overall();if(o.nd.length)out.push({l:"inf",t:"Отметка Н/Д в блоках "+o.nd.join(", ")+". Общий балл в отчёте будет помечен как предварительный.",go:"overview"});
+  S.problems.forEach(p=>{if(p.priority==="Критический"&&!filled(p.rec))out.push({l:"err",t:"Критическая проблема «"+(p.problem||"без описания")+"» не имеет рекомендации.",go:"problems"});
+    if(filled(p.problem)&&!filled(p.where))out.push({l:"wrn",t:"Проблема «"+p.problem+"» не привязана к разделу документа.",go:"problems"})});
+  if(!S.matrix.length)out.push({l:"wrn",t:"Матрица согласованности пуста. Блок 8 нельзя оценить обоснованно.",go:"matrix"});
+  const gapRows=S.matrix.filter(r=>filled(r.lo)&&matrixGaps(r).length);
+  if(gapRows.length)out.push({l:"wrn",t:"В матрице "+gapRows.length+" результат(а) с разрывом цепочки. Убедитесь, что они отражены в таблице проблем.",go:"matrix"});
+  if(S.problems.some(p=>p.priority==="Критический")&&!S.plan.must.some(x=>filled(x.t)))out.push({l:"err",t:"Есть критические проблемы, но раздел «Обязательные изменения» пуст.",go:"plan"});
+  const fq=Object.values(S.final).filter(filled).length;if(fq<5)out.push({l:"inf",t:"В финальном заключении заполнено "+fq+" из 5 ответов.",go:"final"});
+  if(!filled(S.verdict.state))out.push({l:"inf",t:"Не выбрана общая оценка состояния программы.",go:"final"});
+  const rank={err:0,wrn:1,inf:2};return out.sort((a,b)=>rank[a.l]-rank[b.l]);
+}
+function progress(){
+  let tot=0,got=0;const add=(c)=>{tot++;if(c)got++};
+  Object.values(S.passport).forEach(v=>add(filled(v)));
+  add(S.docs.length>0);
+  BLOCKS.forEach(b=>{const B=S.blocks[b.id];B.q.forEach(x=>add(!!x.s));add(B.score!==null);add(filled(B.evidence));add(filled(B.recs)||B.score==="nd")});
+  add(S.problems.length>0);add(S.matrix.length>0);add(S.plan.must.length>0);
+  ["summary","strengths","problems","state"].forEach(k=>add(filled(S.verdict[k])));
+  Object.values(S.final).forEach(v=>add(filled(v)));
+  return Math.round(got/tot*100);
+}
+
+/* ---------- маршруты ---------- */
+const ROUTES=[
+ {g:"Подготовка",items:[["overview","Обзор"],["passport","Исходные данные"],["docs","Материалы"]]},
+ {g:"Восемь направлений",items:BLOCKS.map(b=>["block-"+b.id,b.short,b.id])},
+ {g:"Инструменты",items:[["outcomes","Формулировки результатов"],["tasks","Конструктор заданий"],["matrix","Матрица согласованности"],["problems","Таблица проблем"]]},
+ {g:"Итог",items:[["plan","План улучшения"],["structure","Новая структура"],["final","Вердикт и заключение"],["report","Экспертный отчёт"],["prompt","Мастер-промпт"]]}
+];
+const ALL=ROUTES.flatMap(g=>g.items.map(i=>i[0]));
+function routeDot(id){
+  if(id.startsWith("block-")){const s=blockStat(+id.slice(6));if(!s.evOk)return "warn";if(s.score!==null&&s.ans===s.total)return "done";if(s.score!==null||s.ans)return "part";return ""}
+  const m={passport:()=>{const n=Object.values(S.passport).filter(filled).length;return n===7?"done":n?"part":""},
+    docs:()=>S.docs.length?(S.docs.every(d=>filled(d.purpose))?"done":"part"):"warn",
+    matrix:()=>S.matrix.length?(S.matrix.some(r=>matrixGaps(r).length)?"part":"done"):"",
+    problems:()=>S.problems.some(p=>p.priority==="Критический"&&!filled(p.rec))?"warn":S.problems.length?"done":"",
+    plan:()=>S.plan.must.length||S.plan.want.length?"done":"",structure:()=>S.structure.length?"done":"",
+    tasks:()=>S.tasks.length?"done":"",outcomes:()=>filled(S.loDraft)?"part":"",
+    final:()=>{const n=Object.values(S.final).filter(filled).length;return n===5&&filled(S.verdict.state)?"done":n||filled(S.verdict.state)?"part":""}};
+  return m[id]?m[id]():null;
+}
+function renderRail(){
+  const cur=current();
+  $("#rail").innerHTML=ROUTES.map(g=>`<div class="rail-group"><div class="eyebrow">${g.g}</div>${g.items.map(([id,lbl,n])=>{
+    const d=routeDot(id);const sc=n?S.blocks[n].score:undefined;
+    return `<a href="#${id}" class="${cur===id?"on":""}" ${cur===id?'aria-current="page"':""}>${n?`<span class="n">${String(n).padStart(2,"0")}</span>`:""}<span class="t">${esc(lbl)}</span>${n&&sc!==null?`<span class="sc">${scoreTxt(sc)}</span>`:""}${d!==null?`<span class="dot ${d}"></span>`:""}</a>`}).join("")}</div>`).join("");
+}
+function derived(){const p=progress();$("#progBar").style.width=p+"%";$("#progTxt").textContent=p+"%";renderRail()}
+function current(){const h=location.hash.slice(1);return ALL.includes(h)?h:"overview"}
+
+/* ---------- компоненты ---------- */
+const field=(path,label,o={})=>{const v=getPath(path)??"";const req=o.req?" <em>*</em>":"";
+  if(o.area)return `<label class="f"><span>${label}${req}</span><textarea id="f-${path}" data-bind="${path}" rows="${o.rows||3}" placeholder="${esc(o.ph||"")}" class="${o.need&&!filled(v)?"need":""}">${esc(v)}</textarea></label>`;
+  if(o.opts)return `<label class="f"><span>${label}${req}</span><select id="f-${path}" data-bind="${path}">${o.opts.map(x=>`<option value="${esc(x)}" ${x===v?"selected":""}>${esc(x||"Не выбрано")}</option>`).join("")}</select></label>`;
+  if(o.list)return `<label class="f"><span>${label}${req}</span><input type="text" id="f-${path}" data-bind="${path}" value="${esc(v)}" list="${o.list}" placeholder="${esc(o.ph||"")}"></label>`;
+  return `<label class="f"><span>${label}${req}</span><input type="text" id="f-${path}" data-bind="${path}" value="${esc(v)}" placeholder="${esc(o.ph||"")}"></label>`};
+const banner=()=>S.isExample?`<div class="banner"><span><b>Открыт демонстрационный пример.</b> Курс и все данные вымышлены и показывают, как работает инструмент.</span><span class="row"><button class="btn primary sm" data-act="start">Начать свой аудит</button></span></div>`:"";
+const pager=(id)=>{const i=ALL.indexOf(id);const p=ALL[i-1],n=ALL[i+1];const lbl=x=>ROUTES.flatMap(g=>g.items).find(r=>r[0]===x)[1];
+  return `<div class="pager">${p?`<a class="btn ghost" href="#${p}">← ${esc(lbl(p))}</a>`:"<span></span>"}${n?`<a class="btn" href="#${n}">${esc(lbl(n))} →</a>`:""}</div>`};
+
+/* ---------- виды ---------- */
+const V={};
+V.overview=()=>{
+  const P=S.passport,o=overall(),ch=chain(),ck=checks();
+  const state=S.verdict.state;const stCls=state===STATES[1]?"ok":state===STATES[2]?"warn":state?"crit":"nd";
+  let cap;if(o.avg===null)cap="Ни один блок пока не оценён числом.";
+  else if(o.nd.length||o.none.length)cap=`Среднее по ${o.n} из 8 блоков. Предварительно, так как ${o.nd.length?"есть отметки Н/Д":""}${o.nd.length&&o.none.length?" и ":""}${o.none.length?"не все блоки оценены":""}.`;
+  else cap="Среднее по всем восьми блокам. Минимальный балл "+o.min+".";
+  const meta=[["Тип",P.type],["Уровень",P.level],["Объём",P.duration],["Формат",P.format],["Назначение",P.purpose]];
+  const cov=(k)=>ch.n?Math.round(ch[k]/ch.n*100):0;
+  const lk=(lab,val,max,pct)=>{if(pct===undefined)pct=max?Math.round(val/max*100):0;const full=pct>=100;
+    return `<div class="link"><div class="k">${lab}</div><div class="v">${val}${max!==undefined?`<small> / ${max}</small>`:""}</div><div class="bar"><i style="width:${pct}%;background:${full?"var(--accent)":"var(--mark)"}"></i></div></div>`};
+  return `${banner()}
+  <section class="hero">
+    <div class="hero-l">
+      <div class="eyebrow">Независимая методическая экспертиза</div>
+      <h1>${esc(P.name)||'<span style="color:var(--faint)">Курс не указан</span>'}</h1>
+      <div class="chips">${meta.map(([k,v])=>`<span class="chip ${filled(v)?"":"empty"}">${k}${filled(v)?" · "+esc(v):" не указан"}</span>`).join("")}</div>
+      <div class="index"><div class="big">${o.avg===null?"Н/Д":fmt(o.avg)}<small> / 5</small></div><div class="cap">${cap}</div></div>
+      <div class="row"><span class="pill ${stCls}">${esc(state||"Состояние программы не определено")}</span></div>
+      <div class="row"><a class="btn primary" href="#${S.docs.length?"block-1":"docs"}">${S.docs.length?"Продолжить аудит":"Добавить материалы"}</a><a class="btn" href="#prompt">Мастер-промпт для ИИ</a></div>
+    </div>
+    <div class="hero-r"><div id="stage" role="img" aria-label="Объёмный профиль оценок по восьми блокам"></div>
+      <div class="stage-cap"><span>Потяните, чтобы повернуть. Нажмите на столбец, чтобы открыть блок.</span>
+      <span class="legend"><span><i style="background:var(--s1)"></i>0–1</span><span><i style="background:var(--s2)"></i>2</span><span><i style="background:var(--s3)"></i>3</span><span><i style="background:var(--s5)"></i>4–5</span><span><i style="border:1px solid var(--nd)"></i>Н/Д</span></span></div>
+    </div>
+  </section>
+  <section class="stack">
+    <div class="head"><div><div class="eyebrow">Сквозная проверка</div><h2>Цель → Результат → Тема → Деятельность → Оценивание</h2>
+    <p>Покрытие считается по строкам матрицы согласованности. Каждый результат обучения должен иметь тему, учебную деятельность и способ проверки.</p></div><a class="btn" href="#matrix">Открыть матрицу</a></div>
+    <div class="chain">${lk("Цель",ch.goal?"есть":"нет",undefined,ch.goal?100:0)}${lk("Результаты",ch.n,undefined,ch.n?100:0)}${lk("Темы",ch.topics,ch.n)}${lk("Деятельность",ch.tasks,ch.n)}${lk("Оценивание",ch.assess,ch.n)}</div>
+  </section>
+  <section class="stack">
+    <div class="head"><div><div class="eyebrow">Направления аудита</div><h2>Восемь блоков</h2></div></div>
+    <div class="tiles">${BLOCKS.map(b=>{const s=blockStat(b.id);return `<a class="tile" href="#block-${b.id}"><div class="top-row"><div><div class="num">БЛОК ${String(b.id).padStart(2,"0")}</div><h4>${esc(b.title)}</h4></div><span class="score ${scoreCls(s.score)}">${scoreTxt(s.score)}</span></div>
+      <div class="meta"><span>Вопросы ${s.ans}/${s.total}</span><span style="color:${s.evOk?"var(--muted)":"var(--crit)"}">${s.score===null?"не оценён":s.evOk?"доказательство есть":"нет доказательства"}</span></div></a>`}).join("")}</div>
+  </section>
+  <section class="card stack">
+    <div class="head"><div><div class="eyebrow">Правила экспертизы</div><h3 style="margin:0">Проверка отчёта</h3></div><span class="note mono">${ck.filter(c=>c.l==="err").length} ошибок · ${ck.filter(c=>c.l==="wrn").length} предупреждений</span></div>
+    <div class="checks">${ck.length?ck.slice(0,8).map(c=>`<a class="check ${c.l}" href="#${c.go}"><span class="lvl">${{err:"Ошибка",wrn:"Внимание",inf:"Заметка"}[c.l]}</span><span>${esc(c.t)}</span></a>`).join(""):'<div class="check inf"><span class="lvl">Готово</span><span>Нарушений правил экспертизы не найдено.</span></div>'}
+    ${ck.length>8?`<a class="note" href="#report">Ещё ${ck.length-8} в разделе отчёта</a>`:""}</div>
+  </section>`;
+};
+V.passport=()=>`${banner()}<div class="head"><div><div class="eyebrow">Раздел 2 мастер-промпта</div><h2>Исходные данные</h2><p>Заполняйте только то, что подтверждено документами. Пустое поле честнее придуманного значения, инструмент учтёт его как ограничение выводов.</p></div></div>
+ <div class="card"><div class="grid2">
+  ${field("passport.name","Название курса",{ph:"Например, Основы банковского дела"})}
+  ${field("passport.type","Тип программы",{list:"dl-type",ph:"СПО, ВУЗ, ДПО, онлайн-курс"})}
+  ${field("passport.audience","Целевая аудитория",{ph:"Кто обучается"})}
+  ${field("passport.level","Уровень подготовки",{opts:["","Начальный","Средний","Продвинутый"]})}
+  ${field("passport.duration","Продолжительность",{ph:"Часы, недели, семестр"})}
+  ${field("passport.format","Формат",{opts:["","Очный","Дистанционный","Смешанный"]})}
+  ${field("passport.purpose","Назначение аудита",{opts:["","Первичная экспертиза","Переработка","Подготовка к утверждению","Повышение качества"]})}
+ </div>
+ <datalist id="dl-type"><option value="СПО"><option value="ВУЗ"><option value="ДПО"><option value="Онлайн-курс"></datalist></div>${pager("passport")}`;
+V.docs=()=>`${banner()}<div class="head"><div><div class="eyebrow">Начало анализа</div><h2>Материалы для анализа</h2><p>Сначала установите назначение каждого документа и связи между ними, затем переходите к блокам. Текст документа можно вставить или загрузить из файла .txt или .md, он попадёт в мастер-промпт.</p></div><button class="btn primary" data-act="add-doc">Добавить документ</button></div>
+ <div class="stack">${S.docs.length?S.docs.map((d,i)=>`<div class="rec"><div class="rec-h"><span class="eyebrow">Документ ${i+1}</span><button class="x" data-act="del" data-list="docs" data-id="${d.id}" aria-label="Удалить документ">×</button></div>
+  <div class="grid2">${field(`docs.${i}.name`,"Название")}${field(`docs.${i}.kind`,"Вид",{opts:["",...DOC_KINDS]})}
+  ${field(`docs.${i}.purpose`,"Назначение",{area:1,rows:2,ph:"Что этот документ задаёт или подтверждает"})}${field(`docs.${i}.relation`,"Связь с другими документами",{area:1,rows:2,ph:"На что ссылается, что детализирует"})}</div>
+  ${field(`docs.${i}.text`,"Текст или выдержки",{area:1,rows:4,ph:"Вставьте текст документа или ключевые разделы"})}
+  <div class="row"><label class="btn sm file">Загрузить .txt / .md<input type="file" accept=".txt,.md,text/plain,text/markdown" data-file="${i}" hidden></label><span class="note mono">${(d.text||"").length.toLocaleString("ru-RU")} знаков</span></div></div>`).join(""):
+  `<div class="card note box">Документы не добавлены. Без материалов любые оценки будут необоснованными. Добавьте программу, учебный план, рабочую программу, тематический план, методические материалы, задания или оценочные средства.</div>`}</div>${pager("docs")}`;
+function blockView(id){
+  const b=BLOCKS[id-1],B=S.blocks[id];
+  const extra=id===1?`<div class="note box">Для проверки формулировок используйте <a href="#outcomes">анализатор результатов обучения</a>. Он выявляет неизмеримые глаголы и предлагает наблюдаемые действия.</div>`:
+    id===4?`<div class="note box">Новые задания описывайте в <a href="#tasks">конструкторе заданий</a> через цель, условия, ожидаемый результат и проверяемое умение.</div>`:
+    id===8?`<div class="note box">Основа оценки этого блока находится в <a href="#matrix">матрице согласованности</a>. Сейчас в ней ${S.matrix.length} строк(и).</div>`:
+    id===3?hoursView():"";
+  return `${banner()}<div class="head"><div><div class="eyebrow">Блок ${id} из 8</div><h2>${esc(b.title)}</h2></div><span class="score ${scoreCls(B.score)}" style="height:40px;min-width:52px;font-size:20px">${scoreTxt(B.score)}</span></div>
+  <p class="focus">${esc(b.focus)}</p>${extra}
+  <div class="card"><h3>Контрольные вопросы</h3>${b.q.map((q,i)=>`<div class="q"><span class="i">${id}.${i+1}</span><span class="txt">${esc(q)}</span>
+    <div class="ctl"><div class="seg" role="group" aria-label="Ответ">${QS.map(([v,l])=>`<button type="button" data-act="q" data-b="${id}" data-i="${i}" data-v="${v}" class="${B.q[i].s===v?"on":""}" aria-pressed="${B.q[i].s===v}">${l}</button>`).join("")}</div>
+    <input type="text" id="f-blocks.${id}.q.${i}.n" data-bind="blocks.${id}.q.${i}.n" value="${esc(B.q[i].n)}" placeholder="Факт из документа, раздел"></div></div>`).join("")}</div>
+  <div class="card stack"><h3 style="margin:0">Оценка блока</h3>
+    <div class="scale" role="group" aria-label="Балл">${[0,1,2,3,4,5,"nd"].map(v=>`<button type="button" data-act="score" data-b="${id}" data-v="${v}" class="${B.score===v?"on":""}" aria-pressed="${B.score===v}"><b>${v==="nd"?"Н/Д":v}</b><span>${SCALE[v]}</span></button>`).join("")}</div>
+    <div class="row"><button class="btn ghost sm" data-act="score" data-b="${id}" data-v="clear">Снять оценку</button><span class="note">Для каждого балла нужно доказательство из материалов. При нехватке данных ставьте Н/Д.</span></div>
+    <div class="grid2">${field(`blocks.${id}.evidence`,"Доказательство из материалов",{area:1,rows:4,req:1,need:B.score!==null,ph:"Конкретный факт с привязкой к документу"})}${field(`blocks.${id}.source`,"Документ и раздел",{ph:"Например, РП, п. 1.3"})}</div>
+    <div class="grid2">${field(`blocks.${id}.remarks`,"Замечания и обоснования",{area:1,rows:4,ph:"Экспертный вывод. Отделяйте факты от предположений"})}${field(`blocks.${id}.recs`,"Рекомендации",{area:1,rows:4,ph:"Что изменить и зачем"})}</div>
+  </div>${pager("block-"+id)}`;
+}
+function hoursView(){
+  const h=S.blocks[3].hours;const keys=[["theory","Теория","var(--s3)"],["practice","Практика","var(--s5)"],["self","Самостоятельная работа","var(--accent)"],["control","Контроль","var(--nd)"]];
+  const nums=keys.map(([k])=>parseFloat(String(h[k]).replace(",",".")));const ok=nums.every(n=>!isNaN(n)&&n>=0);const sum=ok?nums.reduce((a,c)=>a+c,0):0;
+  return `<div class="card"><h3>Распределение часов по видам деятельности</h3><div class="hours">${keys.map(([k,l])=>field(`blocks.3.hours.${k}`,l+", ч",{ph:"из документа"})).join("")}</div>
+  <div id="hoursOut">${ok&&sum>0?`<div class="stackbar">${keys.map(([k,l,c],i)=>nums[i]?`<div style="flex:${nums[i]};background:${c}" title="${l}">${Math.round(nums[i]/sum*100)}%</div>`:"").join("")}</div><p class="note" style="margin-top:6px">Всего ${String(sum).replace(".",",")} ч. Доля часов не доказывает формирование умений, оценивайте содержание практики.</p>`:
+  `<p class="note" style="margin-top:8px">Распределение появится, когда все четыре значения взяты из документов. Условные проценты не рассчитываются.</p>`}</div></div>`;
+}
+BLOCKS.forEach(b=>{V["block-"+b.id]=()=>blockView(b.id)});
+
+V.problems=()=>{const order=p=>PRIOS.indexOf(p.priority)<0?9:PRIOS.indexOf(p.priority);
+  const cnt=PRIOS.map(p=>[p,S.problems.filter(x=>x.priority===p).length]);
+  const list=S.problems.map((p,i)=>({p,i})).sort((a,b)=>order(a.p)-order(b.p));
+  return `${banner()}<div class="head"><div><div class="eyebrow">Раздел 3 отчёта</div><h2>Таблица проблем</h2><p>Каждое существенное замечание привязывайте к конкретному разделу документа. Не придумывайте недостатки ради критики.</p></div>
+  <div class="row"><button class="btn" data-act="gaps2p">Перенести пробелы из матрицы</button><button class="btn primary" data-act="add-problem">Добавить проблему</button></div></div>
+  <div class="row">${cnt.map(([p,n],k)=>`<span class="prio p${k+1}">${p} · ${n}</span>`).join("")}<span class="note">${PRIOS.map(p=>p+" "+PRIO_DESC[p]).join("; ")}.</span></div>
+  <div class="stack">${list.length?list.map(({p,i})=>`<div class="rec" data-p="${esc(p.priority)}"><div class="rec-h"><span class="eyebrow">Проблема</span><button class="x" data-act="del" data-list="problems" data-id="${p.id}" aria-label="Удалить">×</button></div>
+   <div class="grid2">${field(`problems.${i}.problem`,"Проблема",{area:1,rows:2})}${field(`problems.${i}.where`,"Где обнаружена",{area:1,rows:2,ph:"Документ, раздел"})}
+   ${field(`problems.${i}.effect`,"Последствия",{area:1,rows:2})}${field(`problems.${i}.rec`,"Рекомендация",{area:1,rows:2,need:p.priority==="Критический"})}</div>
+   <div style="max-width:260px">${field(`problems.${i}.priority`,"Приоритет",{opts:["",...PRIOS]})}</div></div>`).join(""):`<div class="card note box">Проблемы не добавлены.</div>`}</div>${pager("problems")}`};
+
+V.matrix=()=>{const rows=S.matrix;
+  return `${banner()}<div class="head"><div><div class="eyebrow">Раздел 4 отчёта · Блок 8</div><h2>Матрица согласованности</h2><p>Для каждого заявленного результата укажите, где он формируется, какие задания помогают его достичь, как он проверяется и хватает ли времени. Разрывы цепочки отмечаются автоматически.</p></div><button class="btn primary" data-act="add-matrix">Добавить результат</button></div>
+  <div class="stack">${rows.length?rows.map((r,i)=>{const g=matrixGaps(r);return `<div class="rec"><div class="rec-h"><span class="eyebrow">Результат ${i+1}</span><span class="row"><span class="gaps" id="gaps-${r.id}">${gapChips(g,r)}</span><button class="x" data-act="del" data-list="matrix" data-id="${r.id}" aria-label="Удалить">×</button></span></div>
+   ${field(`matrix.${i}.lo`,"Результат обучения",{ph:"Наблюдаемое действие обучающегося"})}
+   <div class="grid3">${field(`matrix.${i}.topics`,"Темы",{area:1,rows:2})}${field(`matrix.${i}.tasks`,"Практические задания",{area:1,rows:2})}${field(`matrix.${i}.assess`,"Способ оценки",{area:1,rows:2})}</div>
+   <div class="grid2">${field(`matrix.${i}.time`,"Достаточность времени",{opts:["","Достаточно","Недостаточно","Нет данных"]})}${field(`matrix.${i}.gap`,"Выявленный пробел (экспертный комментарий)")}</div></div>`}).join(""):`<div class="card note box">Матрица пуста. Добавьте результаты обучения из программы или перенесите их из анализатора формулировок.</div>`}</div>${pager("matrix")}`};
+function gapChips(g,r){if(!filled(r.lo))return `<span class="gap" style="background:var(--surface-2);color:var(--faint)">результат не указан</span>`;return g.length?g.map(x=>`<span class="gap">${x}</span>`).join(""):`<span class="gap okk">цепочка замкнута</span>`}
+
+V.outcomes=()=>`${banner()}<div class="head"><div><div class="eyebrow">Блок 1 · инструмент</div><h2>Формулировки результатов обучения</h2><p>Вставьте результаты из программы, по одному на строку. Анализатор отметит неизмеримые формулировки и найдёт наблюдаемые действия. Это подсказка для эксперта, решение о качестве формулировки остаётся за вами.</p></div></div>
+ <div class="grid2" style="align-items:start"><div class="card stack">${field("loDraft","Результаты из документа",{area:1,rows:9,ph:"Каждый результат с новой строки"})}<div class="row"><button class="btn primary" data-act="lo-matrix">Перенести в матрицу</button><span class="note">Добавит строки, которых ещё нет в матрице.</span></div></div>
+ <div class="stack" id="loOut">${loAnalysis()}</div></div>
+ <div class="card"><h3>Наблюдаемые действия по уровням таксономии Блума</h3><div class="bloom">${BLOOM.map(l=>`<div><b>${l.lvl}</b><span>${l.v.join(", ")}</span></div>`).join("")}</div>
+ <p class="note" style="margin-top:10px">Уровень глагола должен соответствовать уровню подготовки и продолжительности курса. Для начального уровня и короткого курса формулировки уровня «Создание» требуют обоснования.</p></div>${pager("outcomes")}`;
+function loAnalysis(){
+  const lines=String(S.loDraft||"").split(/\n+/).map(s=>s.trim()).filter(Boolean);
+  if(!lines.length)return `<div class="card note box">Здесь появится разбор формулировок.</div>`;
+  return lines.map(l=>{const bad=VAGUE.filter(v=>v.re.test(l));const low=l.toLowerCase();
+    const lv=BLOOM.map((b,i)=>({i,lvl:b.lvl,hit:b.v.find(v=>low.includes(v.slice(0,Math.max(4,v.length-2))))})).filter(x=>x.hit);
+    let html=esc(l);bad.forEach(v=>{html=html.replace(new RegExp(v.re.source,"i"),m=>`<mark>${m}</mark>`)});
+    const cls=bad.length?"bad":lv.length?"good":"mid";
+    const status=bad.length?"Неизмеримо":lv.length?"Наблюдаемо · "+lv.map(x=>x.lvl).join(", "):"Проверьте вручную";
+    return `<div class="lo ${cls}"><div>${html}</div><span class="eyebrow" style="color:${bad.length?"var(--crit)":lv.length?"var(--ok)":"var(--warn)"}">${status}</span>
+     <div class="s">${bad.length?bad.map(v=>v.why).join(". ")+". Возможные действия":lv.length?"Уточните объект, условия и критерий выполнения":"Глагол действия не распознан. Уточните, что делает обучающийся"}</div>
+     ${bad.length?`<div class="verbs" style="grid-column:1/-1">${["объяснять","сравнивать","рассчитывать","применять","анализировать","аргументировать"].map(v=>`<button type="button" data-act="verb" data-v="${v}" data-l="${esc(l)}">${v}</button>`).join("")}</div>`:""}</div>`}).join("");
+}
+
+V.tasks=()=>{const los=S.matrix.map(r=>r.lo).filter(filled);
+  return `${banner()}<div class="head"><div><div class="eyebrow">Блок 4 · инструмент</div><h2>Конструктор заданий</h2><p>Новое задание описывается через четыре обязательных элемента. Проверяемое умение лучше выбрать из результатов матрицы, тогда задание войдёт в сквозную проверку.</p></div><button class="btn primary" data-act="add-task">Новое задание</button></div>
+  <datalist id="dl-lo">${los.map(l=>`<option value="${esc(l)}">`).join("")}</datalist>
+  <div class="stack">${S.tasks.length?S.tasks.map((t,i)=>{const n=["goal","cond","result","skill"].filter(k=>filled(t[k])).length;return `<div class="rec"><div class="rec-h"><span class="eyebrow">Задание ${i+1} · заполнено ${n}/4</span><span class="row">${n===4&&filled(t.skill)?`<button class="btn sm" data-act="task2m" data-id="${t.id}">Связать с матрицей</button>`:""}<button class="x" data-act="del" data-list="tasks" data-id="${t.id}" aria-label="Удалить">×</button></span></div>
+   <div class="grid2">${field(`tasks.${i}.goal`,"1. Цель",{area:1,rows:2})}${field(`tasks.${i}.cond`,"2. Условия выполнения",{area:1,rows:2,ph:"Формат, время, исходные данные"})}
+   ${field(`tasks.${i}.result`,"3. Ожидаемый результат",{area:1,rows:2,ph:"Продукт, который можно оценить"})}${field(`tasks.${i}.skill`,"4. Проверяемое умение",{list:"dl-lo"})}</div></div>`}).join(""):`<div class="card note box">Заданий пока нет.</div>`}</div>${pager("tasks")}`};
+
+V.plan=()=>{const G=[["must","Обязательные изменения","без них курс не обеспечивает заявленные результаты"],["want","Желательные изменения","повышают качество и эффективность"],["extra","Дополнительные возможности","новые форматы, инструменты и методические решения"]];
+  return `${banner()}<div class="head"><div><div class="eyebrow">Раздел 5 отчёта</div><h2>План улучшения программы</h2><p>Не предлагайте изменения, не связанные с целями курса. Если достаточно точечных исправлений, не переписывайте программу целиком.</p></div><button class="btn" data-act="p2plan">Добавить рекомендации из проблем</button></div>
+  <div class="cols3">${G.map(([k,t,d])=>`<div class="card col stack"><h3 style="margin:0">${t}<button class="btn sm" data-act="add-plan" data-g="${k}">Добавить</button></h3><p class="note">${d}</p>
+   ${S.plan[k].map((x,i)=>`<div class="item"><textarea id="f-plan.${k}.${i}.t" data-bind="plan.${k}.${i}.t" rows="2">${esc(x.t)}</textarea><button class="x" data-act="del" data-list="plan.${k}" data-id="${x.id}" aria-label="Удалить">×</button></div>`).join("")||'<p class="note box">Пусто</p>'}</div>`).join("")}</div>${pager("plan")}`};
+
+V.structure=()=>`${banner()}<div class="head"><div><div class="eyebrow">Раздел 6 отчёта</div><h2>Предлагаемая структура обновлённого курса</h2><p>Заполняется, только если выявлены существенные недостатки. Сохраняйте сильные элементы исходного курса.</p></div><button class="btn primary" data-act="add-module">Добавить модуль</button></div>
+ <div class="stack">${S.structure.length?S.structure.map((m,i)=>`<div class="rec"><div class="rec-h"><span class="eyebrow">Модуль ${i+1}</span><button class="x" data-act="del" data-list="structure" data-id="${m.id}" aria-label="Удалить">×</button></div>
+  ${field(`structure.${i}.module`,"Название модуля")}<div class="grid2">${field(`structure.${i}.topics`,"Темы",{area:1,rows:2})}${field(`structure.${i}.results`,"Планируемые результаты",{area:1,rows:2})}${field(`structure.${i}.tasks`,"Практические задания",{area:1,rows:2})}${field(`structure.${i}.assess`,"Способы оценки",{area:1,rows:2})}</div>
+  ${field(`structure.${i}.keep`,"Что сохранено из исходного курса",{ph:"Необязательно"})}</div>`).join(""):`<div class="card note box">Новая структура не предлагается. Если недостатки устраняются точечно, этот раздел можно оставить пустым.</div>`}</div>${pager("structure")}`;
+
+V.final=()=>{const Q=["Можно ли использовать программу в текущем виде?","Какие три изменения наиболее важны?","Какие результаты обучения пока не обеспечены содержанием курса?","Что необходимо сделать в первую очередь?","Какой ожидаемый эффект дадут предлагаемые изменения?"];
+  const uncovered=S.matrix.filter(r=>filled(r.lo)&&matrixGaps(r).length).map(r=>r.lo);
+  return `${banner()}<div class="head"><div><div class="eyebrow">Разделы 1 и 7 отчёта</div><h2>Вердикт и заключение</h2></div></div>
+  <div class="card stack"><h3 style="margin:0">Раздел 1. Общий вердикт</h3>
+   ${field("verdict.summary","Краткая характеристика курса",{area:1,rows:3})}
+   <div class="grid2">${field("verdict.strengths","Основные достоинства (с доказательствами)",{area:1,rows:4})}${field("verdict.problems","Главные методические проблемы",{area:1,rows:4})}</div>
+   <div style="max-width:420px">${field("verdict.state","Общая оценка состояния программы",{opts:STATES})}</div></div>
+  <div class="card stack"><h3 style="margin:0">Раздел 7. Финальное заключение</h3>
+   ${Q.map((q,i)=>field("final.q"+(i+1),(i+1)+". "+q,{area:1,rows:i===4?3:2})).join("")}
+   ${uncovered.length?`<div class="note box">Подсказка к вопросу 3. По матрице разрыв цепочки есть у результатов ${uncovered.map(x=>"«"+esc(x)+"»").join(", ")}.</div>`:""}
+   <div class="note">Прогноз эффекта в ответе 5 основан на вероятностях и имеющихся данных, а не является фактом. Сформулируйте его соответственно.</div></div>${pager("final")}`};
+
+/* ---------- отчёт ---------- */
+function reportModel(){
+  const P=S.passport,o=overall(),R=[];const nv=v=>filled(v)?v:null;
+  R.push({h1:"Экспертный отчёт. Методический аудит курса"});
+  R.push({p:[["Курс",P.name],["Тип программы",P.type],["Целевая аудитория",P.audience],["Уровень",P.level],["Продолжительность",P.duration],["Формат",P.format],["Назначение аудита",P.purpose]].map(([k,v])=>k+". "+(filled(v)?v:"не указано")).join("\n")});
+  if(S.isExample)R.push({p:"Внимание. Отчёт построен на демонстрационном примере с вымышленными данными."});
+  R.push({h2:"Проанализированные материалы"});
+  R.push(S.docs.length?{table:["Документ","Вид","Назначение","Связь"],rows:S.docs.map(d=>[d.name,d.kind,d.purpose,d.relation])}:{p:"Материалы не указаны. Выводы отчёта не подтверждены документами."});
+  R.push({h2:"Раздел 1. Общий вердикт"});
+  R.push({h3:"Краткая характеристика курса"},{p:nv(S.verdict.summary)});
+  R.push({h3:"Основные достоинства"},{p:nv(S.verdict.strengths)});
+  R.push({h3:"Главные методические проблемы"},{p:nv(S.verdict.problems)});
+  R.push({h3:"Общая оценка состояния программы"},{p:nv(S.verdict.state)});
+  R.push({h3:"Оценки по блокам"});
+  R.push({table:["Блок","Балл","Доказательство","Источник"],rows:BLOCKS.map(b=>{const B=S.blocks[b.id];return [b.id+". "+b.title,B.score===null?"не оценён":scoreTxt(B.score),B.evidence,B.source]}),center:[1]});
+  R.push({radar:1});
+  let tot;if(o.avg===null)tot="Общий балл не рассчитывается, так как нет числовых оценок.";
+  else if(o.nd.length||o.none.length)tot=`Предварительный средний балл ${fmt(o.avg)} рассчитан по ${o.n} из 8 блоков. ${o.nd.length?"Блоки "+o.nd.join(", ")+" отмечены Н/Д из-за недостатка информации. ":""}${o.none.length?"Блоки "+o.none.join(", ")+" не оценены. ":""}Использовать этот балл как итоговый некорректно.`;
+  else tot=`Средний балл по восьми блокам ${fmt(o.avg)}, минимальный ${o.min}. Средний балл может скрывать критически слабые блоки, поэтому его следует читать вместе с таблицей проблем.`;
+  R.push({p:tot});
+  R.push({h2:"Раздел 2. Детальный аудит"});
+  BLOCKS.forEach(b=>{const B=S.blocks[b.id];R.push({h3:"Блок "+b.id+". "+b.title+" · "+(B.score===null?"не оценён":scoreTxt(B.score))});
+    const qa=b.q.map((q,i)=>B.q[i].s?q+". "+QS.find(x=>x[0]===B.q[i].s)[1]+(filled(B.q[i].n)?". "+B.q[i].n:""):null).filter(Boolean);
+    if(qa.length)R.push({ul:qa});
+    if(b.id===3){const h=B.hours;const nums=["theory","practice","self","control"].map(k=>parseFloat(String(h[k]).replace(",",".")));if(nums.every(n=>!isNaN(n))){const s=nums.reduce((a,c)=>a+c,0);if(s>0)R.push({p:`Распределение часов по документам. Теория ${h.theory} ч, практика ${h.practice} ч, самостоятельная работа ${h.self} ч, контроль ${h.control} ч (всего ${s}).`})}}
+    R.push({p:filled(B.evidence)?"Доказательство. "+B.evidence+(filled(B.source)?" ("+B.source+")":""):null});
+    if(filled(B.remarks))R.push({p:"Замечания. "+B.remarks});if(filled(B.recs))R.push({p:"Рекомендации. "+B.recs});});
+  R.push({h2:"Раздел 3. Таблица проблем"});
+  const ord=p=>{const i=PRIOS.indexOf(p.priority);return i<0?9:i};const pr=[...S.problems].sort((a,b)=>ord(a)-ord(b));
+  R.push(pr.length?{table:["Проблема","Где обнаружена","Последствия","Приоритет","Рекомендация"],rows:pr.map(p=>[p.problem,p.where,p.effect,p.priority,p.rec])}:{p:null});
+  if(S.tasks.length){R.push({h3:"Предлагаемые задания"});R.push({table:["Цель","Условия","Ожидаемый результат","Проверяемое умение"],rows:S.tasks.map(t=>[t.goal,t.cond,t.result,t.skill])})}
+  R.push({h2:"Раздел 4. Матрица согласованности"});
+  R.push(S.matrix.length?{table:["Результат обучения","Темы","Практические задания","Способ оценки","Выявленный пробел"],rows:S.matrix.map(r=>{const g=matrixGaps(r);return [r.lo,r.topics,r.tasks,r.assess,[g.join(", "),r.gap].filter(filled).join(". ")||"не выявлен"]})}:{p:null});
+  R.push({h2:"Раздел 5. План улучшения программы"});
+  [["must","1. Обязательные изменения"],["want","2. Желательные изменения"],["extra","3. Дополнительные возможности"]].forEach(([k,t])=>{R.push({h3:t});const it=S.plan[k].map(x=>x.t).filter(filled);R.push(it.length?{ul:it}:{p:null})});
+  R.push({h2:"Раздел 6. Предлагаемая структура обновлённого курса"});
+  R.push(S.structure.length?{table:["Модуль","Темы","Планируемые результаты","Практические задания","Способы оценки"],rows:S.structure.map(m=>[m.module,m.topics,m.results,m.tasks,m.assess])}:{p:"Перестройка структуры не предлагается."});
+  R.push({h2:"Раздел 7. Финальное заключение"});
+  ["Можно ли использовать программу в текущем виде?","Какие три изменения наиболее важны?","Какие результаты обучения пока не обеспечены содержанием курса?","Что необходимо сделать в первую очередь?","Какой ожидаемый эффект дадут предлагаемые изменения?"].forEach((q,i)=>{R.push({h3:(i+1)+". "+q},{p:nv(S.final["q"+(i+1)])})});
+  return R;
+}
+function radarSVG(){
+  const W=420,H=380,cx=W/2,cy=H/2+4,R=130,N=8;const css=getComputedStyle(document.documentElement);const c=n=>css.getPropertyValue(n).trim();
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Профиль оценок по блокам">`;
+  for(let k=1;k<=5;k++){const pts=[];for(let i=0;i<N;i++){const a=-Math.PI/2+i*2*Math.PI/N;pts.push((cx+Math.cos(a)*R*k/5).toFixed(1)+","+(cy+Math.sin(a)*R*k/5).toFixed(1))}s+=`<polygon points="${pts.join(" ")}" fill="none" stroke="${c("--line")}" stroke-width="1"/>`;s+=`<text x="${cx+3}" y="${cy-R*k/5-2}" font-size="9" fill="${c("--faint")}" font-family="JetBrains Mono,monospace">${k}</text>`}
+  BLOCKS.forEach((b,i)=>{const a=-Math.PI/2+i*2*Math.PI/N;const v=S.blocks[b.id].score;const x2=cx+Math.cos(a)*R,y2=cy+Math.sin(a)*R;
+    s+=`<line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="${c("--line")}"/>`;
+    const lx=cx+Math.cos(a)*(R+26),ly=cy+Math.sin(a)*(R+22);
+    s+=`<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="${c("--muted")}" font-family="Golos Text,sans-serif">${b.id}. ${esc(b.short.split(" ")[0])}</text>`;
+    if(typeof v==="number"){const r=R*v/5;const col=c("--s"+v);s+=`<line x1="${cx}" y1="${cy}" x2="${cx+Math.cos(a)*r}" y2="${cy+Math.sin(a)*r}" stroke="${col}" stroke-width="4" stroke-linecap="round"/><circle cx="${cx+Math.cos(a)*r}" cy="${cy+Math.sin(a)*r}" r="7" fill="${col}"/><text x="${cx+Math.cos(a)*r}" y="${cy+Math.sin(a)*r+0.5}" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#fff" font-family="JetBrains Mono,monospace">${v}</text>`}
+    else if(v==="nd"){s+=`<circle cx="${cx+Math.cos(a)*R*0.5}" cy="${cy+Math.sin(a)*R*0.5}" r="12" fill="${c("--surface")}" stroke="${c("--nd")}" stroke-dasharray="3 2"/><text x="${cx+Math.cos(a)*R*0.5}" y="${cy+Math.sin(a)*R*0.5+0.5}" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="${c("--nd")}" font-family="JetBrains Mono,monospace">Н/Д</text>`}
+  });
+  return s+`<circle cx="${cx}" cy="${cy}" r="2.5" fill="${c("--ink")}"/></svg>`;
+}
+function toHTML(R){return R.map(n=>{
+  if(n.h1)return `<h1>${esc(n.h1)}</h1>`;if(n.h2)return `<h2>${esc(n.h2)}</h2>`;if(n.h3)return `<h3>${esc(n.h3)}</h3>`;
+  if("p" in n)return n.p===null?`<p class="empty-v">Не заполнено</p>`:String(n.p).split("\n").map(x=>`<p>${esc(x)}</p>`).join("");
+  if(n.ul)return `<ul>${n.ul.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
+  if(n.radar)return `<div class="radar">${radarSVG()}</div>`;
+  if(n.table)return `<div class="tw"><table><thead><tr>${n.table.map(h=>`<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>${n.rows.map(r=>`<tr>${r.map((c,i)=>`<td class="${(n.center||[]).includes(i)?"c":""}">${filled(c)?esc(c):'<span class="empty-v">·</span>'}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+  return ""}).join("")}
+function toMD(R){const cell=v=>String(filled(v)?v:"-").replace(/\|/g,"/").replace(/\n+/g," ");return R.map(n=>{
+  if(n.h1)return "# "+n.h1;if(n.h2)return "## "+n.h2;if(n.h3)return "### "+n.h3;
+  if("p" in n)return n.p===null?"_Не заполнено_":String(n.p).split("\n").join("  \n");
+  if(n.ul)return n.ul.map(x=>"- "+x).join("\n");if(n.radar)return "";
+  if(n.table)return "| "+n.table.join(" | ")+" |\n|"+n.table.map(()=>" --- ").join("|")+"|\n"+n.rows.map(r=>"| "+r.map(cell).join(" | ")+" |").join("\n");
+  return ""}).filter(x=>x!=="").join("\n\n")}
+V.report=()=>{const ck=checks();
+  return `${banner()}<div class="head"><div><div class="eyebrow">Результат</div><h2>Экспертный отчёт</h2><p>Отчёт собирается из всех разделов по формату мастер-промпта. Пустые поля помечаются явно, ничего не дописывается автоматически.</p></div>
+  <div class="row"><button class="btn primary" data-act="copy-md">Скопировать в Markdown</button><button class="btn" data-act="copy-json">Скопировать резервную копию</button></div></div>
+  ${ck.filter(c=>c.l!=="inf").length?`<div class="card stack"><h3 style="margin:0">Перед передачей отчёта устраните</h3><div class="checks">${ck.filter(c=>c.l!=="inf").map(c=>`<a class="check ${c.l}" href="#${c.go}"><span class="lvl">${c.l==="err"?"Ошибка":"Внимание"}</span><span>${esc(c.t)}</span></a>`).join("")}</div></div>`:""}
+  <article class="report">${toHTML(reportModel())}</article>
+  <div class="card stack"><h3 style="margin:0">Данные аудита</h3><p class="note">Работа сохраняется в этом браузере автоматически. Чтобы перенести аудит на другое устройство или передать коллеге, скопируйте резервную копию и вставьте её сюда.</p>
+   <textarea id="importBox" rows="4" placeholder="Вставьте резервную копию (JSON)"></textarea>
+   <div class="row"><button class="btn" data-act="import">Восстановить из копии</button><label class="btn file">Открыть файл .json<input type="file" accept=".json,application/json" id="importFile" hidden></label><button class="btn ghost" data-act="example">Загрузить пример</button><button class="btn danger" data-act="reset-ask">Очистить всё</button></div>
+   <div id="confirmSlot"></div></div>`};
+
+/* ---------- мастер-промпт ---------- */
+let withText=true;
+function promptText(){
+  const P=S.passport,v=(x,ph)=>filled(x)?x:"["+ph+"]";
+  const mats=S.docs.length?S.docs.map((d,i)=>`${i+1}. ${d.name||"Без названия"}${d.kind?" ("+d.kind+")":""}${filled(d.purpose)?". Назначение: "+d.purpose:""}${filled(d.relation)?". Связь: "+d.relation:""}`).join("\n"):"[ПРИЛОЖИТЬ ПРОГРАММУ, УЧЕБНЫЙ ПЛАН, РАБОЧУЮ ПРОГРАММУ, ТЕМАТИЧЕСКИЙ ПЛАН, МЕТОДИЧЕСКИЕ МАТЕРИАЛЫ, ЗАДАНИЯ И ОЦЕНОЧНЫЕ СРЕДСТВА]";
+  const texts=withText?S.docs.filter(d=>filled(d.text)).map(d=>`\n===== ДОКУМЕНТ: ${d.name||"Без названия"} =====\n${d.text.trim()}\n===== КОНЕЦ ДОКУМЕНТА =====`).join("\n"):"";
+  return `МАСТЕР-ПРОМПТ: НЕЗАВИСИМЫЙ МЕТОДИЧЕСКИЙ АУДИТ ОБРАЗОВАТЕЛЬНОГО КУРСА
+
+1. РОЛЬ И ЗАДАЧА
+
+Ты — независимый эксперт по проектированию образовательных программ, педагогический дизайнер и методист с опытом разработки и аудита программ профессионального образования.
+
+Твоя задача — провести критический методический аудит представленного курса и определить:
+- насколько программа соответствует заявленным целям;
+- насколько логично организовано содержание;
+- достаточно ли теории и практики;
+- формируются ли заявленные знания, умения и компетенции;
+- позволяют ли задания и оценочные средства проверить результаты обучения;
+- какие недостатки снижают образовательную эффективность;
+- какие изменения дадут наибольший результат.
+
+Не ограничивайся описанием программы. Проверяй её внутреннюю логику, выявляй противоречия, пробелы и методические риски.
+Работай как независимый эксперт, а не как автор, заинтересованный в положительной оценке собственной разработки.
+
+2. ИСХОДНЫЕ ДАННЫЕ
+
+Название курса: ${v(P.name,"НАЗВАНИЕ")}
+Тип программы: ${v(P.type,"СПО / ВУЗ / ДПО / ОНЛАЙН-КУРС / ДРУГОЕ")}
+Целевая аудитория: ${v(P.audience,"КТО ОБУЧАЕТСЯ")}
+Уровень подготовки: ${v(P.level,"НАЧАЛЬНЫЙ / СРЕДНИЙ / ПРОДВИНУТЫЙ")}
+Продолжительность: ${v(P.duration,"ЧАСЫ / НЕДЕЛИ / СЕМЕСТР")}
+Формат: ${v(P.format,"ОЧНЫЙ / ДИСТАНЦИОННЫЙ / СМЕШАННЫЙ")}
+Назначение аудита: ${v(P.purpose,"ПЕРВИЧНАЯ ЭКСПЕРТИЗА / ПЕРЕРАБОТКА / ПОДГОТОВКА К УТВЕРЖДЕНИЮ / ПОВЫШЕНИЕ КАЧЕСТВА")}
+
+Материалы для анализа:
+${mats}
+
+Если часть данных отсутствует, не придумывай их. Укажи, какие выводы можно сделать по имеющимся документам, а какие требуют дополнительной информации.
+
+3. НАПРАВЛЕНИЯ АУДИТА
+
+БЛОК 1. ЦЕЛИ И РЕЗУЛЬТАТЫ ОБУЧЕНИЯ
+Проверь:
+- Насколько чётко сформулированы цели курса?
+- Соответствуют ли они потребностям целевой аудитории?
+- Определены ли конкретные результаты обучения?
+- Можно ли проверить достижение каждого результата?
+- Соответствуют ли результаты уровню подготовки и продолжительности курса?
+- Есть ли связь с профессиональными или образовательными задачами обучающихся?
+Выяви расплывчатые, декларативные и неизмеримые формулировки.
+Предложи улучшенные формулировки результатов обучения с использованием наблюдаемых действий: объяснять, анализировать, рассчитывать, сравнивать, применять, аргументировать, разрабатывать и т. д.
+
+БЛОК 2. СТРУКТУРА И ЛОГИКА КУРСА
+Проанализируй:
+- последовательность модулей и тем;
+- переход от базовых знаний к сложным;
+- логические связи между разделами;
+- наличие необходимых предварительных знаний;
+- повторы и дублирование содержания;
+- необоснованные пропуски;
+- соответствие объёма содержания времени обучения.
+Определи, какие темы необходимо переставить, объединить, разделить, сократить или дополнить.
+Проверь, формирует ли структура курса целостное понимание предмета, а не набор разрозненных тем.
+
+БЛОК 3. БАЛАНС ТЕОРИИ И ПРАКТИКИ
+Оцени:
+- соотношение теоретических и практических занятий;
+- наличие практического применения после изучения ключевых понятий;
+- связь заданий с профессиональными или жизненными ситуациями;
+- постепенное усложнение практических задач;
+- достаточность самостоятельной работы;
+- возможность переноса знаний в новые ситуации.
+Не оценивай баланс только по количеству часов или заданий.
+Проверь, позволяет ли практика действительно сформировать заявленные умения.
+Если данных достаточно, представь распределение часов и содержания по видам деятельности. Если данных нет, не рассчитывай условные проценты.
+
+БЛОК 4. ЗАДАНИЯ И УЧЕБНАЯ ДЕЯТЕЛЬНОСТЬ
+Проанализируй:
+- соответствие заданий результатам обучения;
+- разнообразие форм учебной деятельности;
+- уровень сложности;
+- наличие индивидуальных и групповых заданий;
+- проблемные, исследовательские и практико-ориентированные задачи;
+- возможность самостоятельного принятия решений;
+- наличие заданий на анализ, аргументацию и применение знаний.
+Определи, какие задания недостаточно эффективны, повторяются или не имеют очевидной учебной цели.
+Предложи конкретные новые задания с указанием:
+1. Цели.
+2. Условия выполнения.
+3. Ожидаемого результата.
+4. Проверяемого умения.
+
+БЛОК 5. ОЦЕНИВАНИЕ И ОБРАТНАЯ СВЯЗЬ
+Проверь:
+- соответствие контрольных мероприятий результатам обучения;
+- наличие входного, текущего и итогового контроля;
+- разнообразие оценочных средств;
+- понятность критериев оценивания;
+- возможность объективно оценить практические умения;
+- качество и своевременность обратной связи;
+- наличие возможностей для исправления ошибок и повторного выполнения заданий.
+Проверь, не подменяется ли оценка практических компетенций проверкой теоретических знаний.
+При необходимости предложи новые критерии, рубрики, контрольные задания и способы оценивания.
+
+БЛОК 6. УЧЕБНЫЕ МАТЕРИАЛЫ И РЕСУРСЫ
+Оцени:
+- достаточность учебных материалов;
+- соответствие материалов уровню аудитории;
+- актуальность информации;
+- наличие практических примеров;
+- доступность и понятность объяснений;
+- наличие дополнительных источников и инструментов;
+- соответствие ресурсов содержанию и целям курса.
+Выяви, каких материалов не хватает для полноценного освоения программы.
+Не предлагай ресурсы только ради увеличения их количества.
+
+БЛОК 7. ПРОФЕССИОНАЛЬНАЯ И ПРАКТИЧЕСКАЯ ЦЕННОСТЬ
+Определи:
+- какие знания и умения студент сможет использовать после обучения;
+- насколько содержание приближено к реальным профессиональным задачам;
+- есть ли связь между теорией и практикой профессиональной деятельности;
+- формируются ли самостоятельность, аналитическое мышление и способность принимать решения;
+- какие элементы программы требуют обновления с учётом изменений профессиональной среды.
+Не приписывай курсу результаты, которые не подтверждаются его содержанием.
+
+БЛОК 8. ЦЕЛОСТНОСТЬ И МЕТОДИЧЕСКАЯ СОГЛАСОВАННОСТЬ
+Проведи сквозную проверку:
+ЦЕЛЬ → РЕЗУЛЬТАТ ОБУЧЕНИЯ → ТЕМА → УЧЕБНАЯ ДЕЯТЕЛЬНОСТЬ → ОЦЕНИВАНИЕ.
+Для каждого заявленного результата проверь:
+- где он формируется;
+- какие задания помогают его достичь;
+- каким способом проверяется;
+- достаточно ли учебного времени для его освоения.
+Представь выявленные несоответствия в отдельной таблице.
+
+4. ИТОГОВАЯ ОЦЕНКА
+
+Оцени каждый блок по шкале от 0 до 5:
+0 — элемент отсутствует или не позволяет выполнить функцию.
+1 — критически недостаточный уровень.
+2 — имеются существенные недостатки.
+3 — приемлемый уровень, но необходимы улучшения.
+4 — хороший уровень с отдельными недочётами.
+5 — высокий уровень, методически обоснованное решение.
+Для каждого балла приведи доказательство из предоставленных материалов.
+Если информации недостаточно, поставь отметку «Н/Д» вместо искусственной оценки.
+Не рассчитывай общий балл по неполным данным без отдельного пояснения.
+
+5. ФОРМАТ РЕЗУЛЬТАТА
+
+Подготовь экспертный отчёт из следующих разделов.
+
+Раздел 1. Общий вердикт
+- Краткая характеристика курса.
+- Основные достоинства.
+- Главные методические проблемы.
+- Общая оценка состояния программы.
+
+Раздел 2. Детальный аудит
+Представь результаты по восьми направлениям с конкретными замечаниями, обоснованиями и рекомендациями.
+
+Раздел 3. Таблица проблем
+| Проблема | Где обнаружена | Последствия | Приоритет | Рекомендация |
+Приоритеты:
+- Критический — мешает достижению целей курса.
+- Высокий — существенно снижает качество обучения.
+- Средний — требует планового улучшения.
+- Низкий — желательное усовершенствование.
+
+Раздел 4. Матрица согласованности
+| Результат обучения | Темы | Практические задания | Способ оценки | Выявленный пробел |
+
+Раздел 5. План улучшения программы
+Раздели рекомендации на три группы:
+1. Обязательные изменения — без них курс не обеспечивает заявленные результаты.
+2. Желательные изменения — повышают качество и эффективность.
+3. Дополнительные возможности — новые форматы, инструменты и методические решения.
+
+Раздел 6. Предлагаемая структура обновлённого курса
+Если выявлены существенные недостатки, предложи новую структуру:
+- модули;
+- темы;
+- планируемые результаты;
+- практические задания;
+- способы оценки.
+Не перестраивай программу без необходимости. Сохраняй сильные элементы исходного курса.
+
+Раздел 7. Финальное заключение
+Ответь на вопросы:
+1. Можно ли использовать программу в текущем виде?
+2. Какие три изменения наиболее важны?
+3. Какие результаты обучения пока не обеспечены содержанием курса?
+4. Что необходимо сделать в первую очередь?
+5. Какой ожидаемый эффект дадут предлагаемые изменения?
+
+6. ПРАВИЛА ЭКСПЕРТИЗЫ
+
+- Будь объективным и требовательным.
+- Не хвали программу без доказательств.
+- Не выдумывай недостатки ради критики.
+- Разделяй факты, экспертные выводы и предположения.
+- Каждое существенное замечание привязывай к конкретному разделу документа.
+- Не предлагай изменения, не связанные с целями курса.
+- Учитывай уровень подготовки, формат и продолжительность обучения.
+- Не заменяй профессиональную специфику общими педагогическими рекомендациями.
+- Не переписывай всю программу, если достаточно точечных исправлений.
+
+Главный критерий: программа должна обеспечивать реальное достижение заявленных результатов обучения, а не просто содержать определённое количество тем, лекций и заданий.
+
+Начни с анализа доступных документов. Если материалов несколько, сначала установи их назначение и взаимосвязь, затем проводи комплексный аудит.${texts?"\n\nТЕКСТЫ МАТЕРИАЛОВ\n"+texts:""}`;
+}
+V.prompt=()=>{const miss=Object.values(S.passport).filter(x=>!filled(x)).length;const nt=S.docs.filter(d=>filled(d.text)).length;
+  return `${banner()}<div class="head"><div><div class="eyebrow">Для работы с ИИ-ассистентом</div><h2>Мастер-промпт</h2><p>Исходный текст задания, в который подставлены данные паспорта и перечень материалов. Незаполненные поля остаются в квадратных скобках, чтобы ассистент не достраивал их сам.</p></div>
+  <div class="row"><button class="btn primary" data-act="copy-prompt">Скопировать промпт</button></div></div>
+  <div class="row"><label class="row" style="gap:6px;font-size:14px"><input type="checkbox" id="withText" ${withText?"checked":""}> Приложить тексты документов (${nt} из ${S.docs.length})</label>
+  ${miss?`<span class="chip">Не заполнено полей паспорта ${miss}</span>`:'<span class="chip">Паспорт заполнен</span>'}<span class="chip mono" id="pLen"></span></div>
+  <pre class="prompt" id="promptOut"></pre>`};
+
+/* ---------- 3D-сцена ---------- */
+const Scene={ok:null,r:null,scene:null,cam:null,group:null,bars:[],labels:[],raf:0,host:null,rotY:-0.4,rotX:0,drag:null,hover:-1,auto:!matchMedia("(prefers-reduced-motion: reduce)").matches,
+ init(){if(this.ok!==null)return this.ok;try{if(!window.THREE)throw 0;const c=document.createElement("canvas");if(!(c.getContext("webgl")||c.getContext("experimental-webgl")))throw 0;
+   this.r=new THREE.WebGLRenderer({antialias:true,alpha:true});this.r.setPixelRatio(Math.min(2,devicePixelRatio||1));this.ok=true}catch(e){this.ok=false;return false}
+   const T=THREE;this.scene=new T.Scene();this.cam=new T.PerspectiveCamera(34,1,.1,100);this.cam.position.set(0,6.4,10.6);this.cam.lookAt(0,.9,0);
+   this.hemi=new T.HemisphereLight(0xffffff,0x444444,.75);this.scene.add(this.hemi);const d=new T.DirectionalLight(0xffffff,.75);d.position.set(4,8,5);this.scene.add(d);
+   this.group=new T.Group();this.scene.add(this.group);
+   this.baseMat=new T.MeshStandardMaterial({roughness:.7,metalness:.1});const base=new T.Mesh(new T.CylinderGeometry(3.25,3.4,.22,8),this.baseMat);base.rotation.y=Math.PI/8;base.position.y=-.11;this.group.add(base);
+   this.ringMat=new T.LineBasicMaterial({transparent:true,opacity:.35});
+   for(let k=1;k<=5;k++){const pts=[];for(let i=0;i<=8;i++){const a=i/8*Math.PI*2;pts.push(new T.Vector3(Math.sin(a)*2.35,k*.5,Math.cos(a)*2.35))}const l=new T.Line(new T.BufferGeometry().setFromPoints(pts),this.ringMat);this.group.add(l)}
+   const axisPts=[];for(let i=0;i<8;i++){const a=i/8*Math.PI*2;axisPts.push(new T.Vector3(0,.01,0),new T.Vector3(Math.sin(a)*3.1,.01,Math.cos(a)*3.1))}
+   this.group.add(new T.LineSegments(new T.BufferGeometry().setFromPoints(axisPts),this.ringMat));
+   for(let i=0;i<8;i++){const a=i/8*Math.PI*2;const geo=new T.BoxGeometry(.62,1,.62);geo.translate(0,.5,0);const m=new T.MeshStandardMaterial({roughness:.45,metalness:.15,transparent:true});
+     const mesh=new T.Mesh(geo,m);mesh.position.set(Math.sin(a)*2.35,0,Math.cos(a)*2.35);mesh.rotation.y=a;mesh.scale.y=.02;mesh.userData={i,h:.02,target:.02};
+     const edges=new T.LineSegments(new T.EdgesGeometry(geo),new T.LineBasicMaterial({transparent:true,opacity:.9}));mesh.add(edges);mesh.userData.edges=edges;
+     this.group.add(mesh);this.bars.push(mesh)}
+   this.ray=new T.Raycaster();this.ptr=new T.Vector2();this.applyTheme();
+   const mo=new MutationObserver(()=>this.applyTheme());mo.observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+   matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>this.applyTheme());
+   return true},
+ col(n){return new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue(n).trim()||"#888")},
+ applyTheme(){if(!this.ok)return;this.baseMat.color=this.col("--surface");this.ringMat.color=this.col("--line-strong");this.update()},
+ update(){if(!this.ok)return;BLOCKS.forEach((b,i)=>{const v=S.blocks[b.id].score;const m=this.bars[i];const mat=m.material;const em=m.userData.edges.material;
+   if(typeof v==="number"){m.userData.target=Math.max(.06,v*.5);mat.color=this.col("--s"+v);mat.opacity=1;em.color=this.col("--s"+v);em.opacity=.0}
+   else if(v==="nd"){m.userData.target=2.5;mat.color=this.col("--nd");mat.opacity=.08;em.color=this.col("--nd");em.opacity=.9}
+   else{m.userData.target=.05;mat.color=this.col("--line-strong");mat.opacity=.9;em.opacity=0}
+   mat.emissive=new THREE.Color(0x000000)});},
+ mount(el){this.host=el;if(!this.init()){el.innerHTML=`<div class="fallback radar">${radarSVG()}</div>`;return}
+   el.innerHTML="";el.appendChild(this.r.domElement);this.labels=BLOCKS.map(b=>{const d=document.createElement("div");d.className="lbl";el.appendChild(d);return d});
+   this.tip=document.createElement("div");this.tip.className="tip";this.tip.hidden=true;el.appendChild(this.tip);
+   this.update();this.resize();if(this.ro)this.ro.disconnect();this.ro=new ResizeObserver(()=>this.resize());this.ro.observe(el);
+   el.onpointerdown=e=>{this.drag={x:e.clientX,y:e.clientY,ry:this.rotY,rx:this.rotX,moved:false};el.classList.add("drag");el.setPointerCapture(e.pointerId)};
+   el.onpointermove=e=>{const r=el.getBoundingClientRect();this.ptr.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);
+     if(this.drag){const dx=e.clientX-this.drag.x,dy=e.clientY-this.drag.y;if(Math.abs(dx)+Math.abs(dy)>4)this.drag.moved=true;this.rotY=this.drag.ry+dx*.008;this.rotX=Math.max(-.25,Math.min(.35,this.drag.rx+dy*.004))}};
+   el.onpointerup=e=>{el.classList.remove("drag");const d=this.drag;this.drag=null;if(d&&!d.moved&&this.hover>=0)location.hash="block-"+(this.hover+1)};
+   el.onpointerleave=()=>{this.ptr.set(9,9)};this.ptr.set(9,9);
+   cancelAnimationFrame(this.raf);const loop=()=>{this.raf=requestAnimationFrame(loop);this.frame()};loop()},
+ unmount(){cancelAnimationFrame(this.raf);if(this.ro)this.ro.disconnect();this.host=null},
+ resize(){if(!this.host)return;const w=this.host.clientWidth,h=this.host.clientHeight;if(!w||!h)return;this.r.setSize(w,h,false);this.cam.aspect=w/h;this.cam.fov=w<520?46:36;this.cam.updateProjectionMatrix()},
+ frame(){if(!this.host||!document.body.contains(this.host)){this.unmount();return}
+   if(this.auto&&!this.drag&&this.hover<0)this.rotY+=.0022;this.group.rotation.y=this.rotY;this.group.rotation.x=this.rotX;
+   this.bars.forEach(m=>{const u=m.userData;u.h+=(u.target-u.h)*.08;m.scale.y=u.h});
+   this.ray.setFromCamera(this.ptr,this.cam);const hit=this.ray.intersectObjects(this.bars,false)[0];const hv=hit?hit.object.userData.i:-1;
+   if(hv!==this.hover){this.hover=hv;this.bars.forEach((m,i)=>{m.material.emissive=i===hv?this.col("--accent").multiplyScalar(.35):new THREE.Color(0)});
+     if(hv>=0){const b=BLOCKS[hv],B=S.blocks[b.id];this.tip.innerHTML=`<b>Блок ${b.id}. ${esc(b.title)}</b><br>${B.score===null?"Не оценён":scoreTxt(B.score)+". "+esc(SCALE[B.score])}`;this.tip.hidden=false}else this.tip.hidden=true}
+   this.r.render(this.scene,this.cam);
+   const w=this.host.clientWidth,h=this.host.clientHeight;const v=new THREE.Vector3();
+   this.group.updateMatrixWorld();this.bars.forEach((m,i)=>{v.set(m.position.x,m.userData.h+.22,m.position.z);this.group.localToWorld(v);v.project(this.cam);const L=this.labels[i];
+     L.style.left=((v.x+1)/2*w)+"px";L.style.top=((1-v.y)/2*h)+"px";const B=S.blocks[BLOCKS[i].id];
+     const t=`<b>${scoreTxt(B.score)}</b>блок ${BLOCKS[i].id}`;if(L._t!==t){L.innerHTML=t;L._t=t}L.classList.toggle("hl",i===this.hover);L.style.opacity=v.z<1?1:0})}
+};
+
+/* ---------- рендер ---------- */
+let lastRoute=null;
+function render(){
+  const id=current();const main=$("#main");
+  main.innerHTML=`<div class="panel">${V[id]()}</div>`;
+  if(id==="overview"){Scene.mount($("#stage"));bindTilt()}else Scene.unmount();
+  if(id==="prompt")fillPrompt();
+  derived();if(lastRoute!==id){window.scrollTo(0,0);lastRoute=id}
+}
+function fillPrompt(){const t=promptText();const o=$("#promptOut");if(o)o.textContent=t;const l=$("#pLen");if(l)l.textContent=t.length.toLocaleString("ru-RU")+" знаков"}
+function bindTilt(){if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;document.querySelectorAll(".tile").forEach(t=>{
+  t.addEventListener("pointermove",e=>{const r=t.getBoundingClientRect();const x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;t.style.setProperty("--ry",(x*8)+"deg");t.style.setProperty("--rx",(-y*8)+"deg")});
+  t.addEventListener("pointerleave",()=>{t.style.setProperty("--ry","0deg");t.style.setProperty("--rx","0deg")})})}
+function refreshLive(path){ // точечные обновления без потери фокуса
+  const id=current();
+  if(path.startsWith("matrix.")){const i=+path.split(".")[1];const r=S.matrix[i];if(r){const el=document.getElementById("gaps-"+r.id);if(el)el.innerHTML=gapChips(matrixGaps(r),r)}}
+  if(path==="loDraft"){const o=$("#loOut");if(o)o.innerHTML=loAnalysis()}
+  if(path.startsWith("blocks.3.hours")){const o=$("#hoursOut");if(o){const tmp=document.createElement("div");tmp.innerHTML=hoursView();o.innerHTML=tmp.querySelector("#hoursOut").innerHTML}}
+  if(/^blocks\.\d+\.evidence$/.test(path)){const el=document.getElementById("f-"+path);const B=S.blocks[path.split(".")[1]];if(el)el.classList.toggle("need",B.score!==null&&!filled(el.value))}
+  if(/^problems\.\d+\.priority$/.test(path)){const el=document.getElementById("f-"+path);if(el&&el.closest(".rec"))el.closest(".rec").dataset.p=el.value}
+}
+document.addEventListener("input",e=>{const t=e.target;if(t.dataset&&t.dataset.bind){setPath(t.dataset.bind,t.value);save();refreshLive(t.dataset.bind)}});
+document.addEventListener("change",e=>{const t=e.target;
+  if(t.dataset&&t.dataset.bind&&t.tagName==="SELECT"){setPath(t.dataset.bind,t.value);save();refreshLive(t.dataset.bind)}
+  if(t.id==="withText"){withText=t.checked;fillPrompt()}
+  if(t.dataset&&t.dataset.file!==undefined&&t.files[0]){const i=+t.dataset.file;readFile(t.files[0],txt=>{S.docs[i].text=txt;if(!filled(S.docs[i].name))S.docs[i].name=t.files[0].name.replace(/\.[^.]+$/,"");save();render();toast("Текст документа загружен")})}
+  if(t.id==="importFile"&&t.files[0])readFile(t.files[0],txt=>doImport(txt));
+});
+function readFile(f,cb){if(f.size>5e6){toast("Файл больше 5 МБ. Вставьте нужные разделы вручную");return}const r=new FileReader();r.onload=()=>cb(String(r.result));r.onerror=()=>toast("Не удалось прочитать файл");r.readAsText(f,"utf-8")}
+function doImport(txt){try{const d=JSON.parse(txt);if(!d||!d.blocks||!d.passport)throw 0;S=merge(blank(),d);save();location.hash="overview";render();toast("Аудит восстановлен из копии")}catch(e){toast("Это не резервная копия аудита. Проверьте, что скопирован весь текст")}}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;
+  const re=()=>{save();render()};
+  switch(a){
+   case "q":{const B=S.blocks[b.dataset.b];const q=B.q[+b.dataset.i];q.s=q.s===b.dataset.v?"":b.dataset.v;save();
+     b.parentElement.querySelectorAll("button").forEach(x=>{const on=x.dataset.v===q.s;x.classList.toggle("on",on);x.setAttribute("aria-pressed",on)});break}
+   case "score":{const v=b.dataset.v;S.blocks[b.dataset.b].score=v==="clear"?null:v==="nd"?"nd":+v;re();break}
+   case "add-doc":S.docs.push({id:uid(),name:"",kind:"",purpose:"",relation:"",text:""});re();break;
+   case "add-problem":S.problems.push({id:uid(),problem:"",where:"",effect:"",priority:"",rec:""});re();break;
+   case "add-matrix":S.matrix.push({id:uid(),lo:"",topics:"",tasks:"",assess:"",time:"",gap:""});re();break;
+   case "add-task":S.tasks.push({id:uid(),goal:"",cond:"",result:"",skill:""});re();break;
+   case "add-module":S.structure.push({id:uid(),module:"",topics:"",results:"",tasks:"",assess:"",keep:""});re();break;
+   case "add-plan":S.plan[b.dataset.g].push({id:uid(),t:""});re();break;
+   case "del":{const list=getPath(b.dataset.list);const i=findById(list,b.dataset.id);if(i>=0)list.splice(i,1);re();toast("Удалено");break}
+   case "gaps2p":{let n=0;S.matrix.forEach(r=>{const g=matrixGaps(r);if(filled(r.lo)&&g.length){const txt="Разрыв цепочки для результата «"+r.lo+"» ("+g.join(", ")+")";if(!S.problems.some(p=>p.problem===txt)){S.problems.push({id:uid(),problem:txt,where:"Матрица согласованности",effect:"Достижение результата не обеспечено или не проверяется",priority:g.includes("нет способа оценки")?"Критический":"Высокий",rec:""});n++}}});re();toast(n?"Добавлено проблем: "+n:"Новых пробелов нет");break}
+   case "p2plan":{let n=0;S.problems.forEach(p=>{if(!filled(p.rec))return;const g=p.priority==="Критический"?"must":p.priority==="Высокий"?"must":p.priority==="Средний"?"want":"extra";if(!S.plan[g].some(x=>x.t===p.rec)){S.plan[g].push({id:uid(),t:p.rec});n++}});re();toast(n?"Перенесено рекомендаций: "+n:"Новых рекомендаций нет");break}
+   case "lo-matrix":{let n=0;String(S.loDraft||"").split(/\n+/).map(s=>s.trim()).filter(Boolean).forEach(l=>{if(!S.matrix.some(r=>r.lo===l)){S.matrix.push({id:uid(),lo:l,topics:"",tasks:"",assess:"",time:"",gap:""});n++}});save();toast(n?"В матрицу добавлено строк: "+n:"Все результаты уже есть в матрице");derived();break}
+   case "verb":{const l=b.dataset.l,v=b.dataset.v;let nl=l;const ph=/иметь представлени[а-яё]*/i;
+     if(ph.test(nl))nl=nl.replace(ph,v);else{const w=nl.split(/(\s+)/);for(let i=0;i<w.length;i++){if(VAGUE.some(x=>x.re.test(" "+w[i]+" "))){w[i]=v;break}}nl=w.join("")}
+     nl=nl.charAt(0).toUpperCase()+nl.slice(1);S.loDraft=String(S.loDraft).split("\n").map(x=>x.trim()===l?nl:x).join("\n");const ta=document.getElementById("f-loDraft");if(ta)ta.value=S.loDraft;save();refreshLive("loDraft");toast("Черновик формулировки обновлён. Уточните объект и критерий");break}
+   case "task2m":{const t=S.tasks.find(x=>x.id===b.dataset.id);const r=S.matrix.find(x=>x.lo.trim()===t.skill.trim());if(r){if(!r.tasks.includes(t.result||t.goal))r.tasks=[r.tasks,"Новое задание. "+(t.goal||t.result)].filter(filled).join("; ");toast("Задание связано с результатом в матрице")}else{S.matrix.push({id:uid(),lo:t.skill,topics:"",tasks:"Новое задание. "+(t.goal||t.result),assess:"",time:"",gap:""});toast("В матрицу добавлен новый результат")}save();break}
+   case "copy-md":copy(toMD(reportModel()),"Отчёт скопирован в формате Markdown");break;
+   case "copy-json":copy(JSON.stringify(S,null,1),"Резервная копия скопирована");break;
+   case "copy-prompt":copy(promptText(),"Мастер-промпт скопирован");break;
+   case "import":doImport(($("#importBox")||{}).value||"");break;
+   case "example":S=example();re();toast("Загружен демонстрационный пример");break;
+   case "start":S=blank();location.hash="passport";re();toast("Начат новый аудит");break;
+   case "reset-ask":$("#confirmSlot").innerHTML=`<div class="confirm"><span>Все данные аудита в этом браузере будут удалены.</span><button class="btn danger sm" data-act="reset-yes">Удалить</button><button class="btn sm" data-act="reset-no">Отмена</button></div>`;break;
+   case "reset-no":$("#confirmSlot").innerHTML="";break;
+   case "reset-yes":S=blank();location.hash="overview";re();toast("Данные очищены");break;
+  }
+});
+window.addEventListener("hashchange",render);
+render();
+})();
+</script>
+</body>
+</html>
